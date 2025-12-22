@@ -34,10 +34,10 @@ export function Portfolio() {
 
   return (
     <Layout>
-      <div className="container px-6 pt-12 pb-24">
-        <div className="text-center mb-16">
+      <div className="container px-6 pt-12 pb-24 flex flex-col items-center">
+        <div className="text-center mb-16 max-w-3xl">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">עבודות נבחרות</h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             אוסף חללים נבחרים שתוכננו למגורים, עבודה והופעה.
           </p>
         </div>
@@ -48,10 +48,10 @@ export function Portfolio() {
             <button
               key={filter.id}
               onClick={() => setActiveFilter(filter.id)}
-              className={`text-sm uppercase tracking-widest px-4 py-2 transition-all duration-300 ${
+              className={`text-sm uppercase tracking-widest px-4 py-2 transition-all duration-300 rounded-full ${
                 activeFilter === filter.id 
-                  ? "border-b border-primary text-primary" 
-                  : "text-muted-foreground hover:text-primary"
+                  ? "bg-primary text-primary-foreground font-semibold" 
+                  : "text-muted-foreground hover:text-primary bg-secondary/30 hover:bg-secondary"
               }`}
             >
               {filter.label}
@@ -62,7 +62,7 @@ export function Portfolio() {
         {/* Grid */}
         <motion.div 
           layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
         >
           <AnimatePresence>
             {filteredProjects.map((project) => (

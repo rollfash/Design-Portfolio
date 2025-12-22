@@ -36,7 +36,6 @@ export function Contact() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Mock submission
     console.log(values);
     setTimeout(() => {
       setIsSubmitted(true);
@@ -49,61 +48,63 @@ export function Contact() {
 
   return (
     <Layout>
-      <div className="container px-6 py-20">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">בוא ניצור משהו יפה.</h1>
-              <p className="text-muted-foreground mb-12 leading-relaxed">
-                בין אם יש לך פרויקט ספציפי בראש או שסתם בא לך לבדוק אפשרויות, אשמח לשמוע ממך.
-                מלא את הפרטים בטופס ואחזור אליך תוך 2-3 ימי עסקים.
-              </p>
+      <div className="container px-6 py-20 flex flex-col items-center">
+        <div className="max-w-3xl w-full text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-primary">בוא ניצור משהו יפה.</h1>
+          <p className="text-muted-foreground leading-relaxed text-lg max-w-xl mx-auto">
+            בין אם יש לך פרויקט ספציפי בראש או שסתם בא לך לבדוק אפשרויות, אשמח לשמוע ממך.
+            מלא את הפרטים בטופס ואחזור אליך תוך 2-3 ימי עסקים.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-5xl">
+            <div className="md:col-span-1 space-y-8 text-center md:text-right bg-secondary/30 p-8 rounded-lg h-fit">
+              <div>
+                <h3 className="font-bold mb-2 text-primary">אימייל</h3>
+                <a href="mailto:hello@galshinhorn.com" className="text-muted-foreground hover:text-primary transition-colors block">hello@galshinhorn.com</a>
+              </div>
+              <div>
+                <h3 className="font-bold mb-2 text-primary">סטודיו</h3>
+                <p className="text-muted-foreground">
+                  שדרות רוטשילד 45<br />
+                  תל אביב, ישראל
+                </p>
+              </div>
+              <div>
+                 <h3 className="font-bold mb-2 text-primary">טלפון</h3>
+                 <p className="text-muted-foreground">050-123-4567</p>
+              </div>
               
-              <div className="space-y-8">
-                <div>
-                  <h3 className="font-semibold mb-2">אימייל</h3>
-                  <a href="mailto:hello@galshinhorn.com" className="text-muted-foreground hover:text-primary transition-colors">hello@galshinhorn.com</a>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">סטודיו</h3>
-                  <p className="text-muted-foreground">
-                    שדרות רוטשילד 45<br />
-                    תל אביב, ישראל
-                  </p>
-                </div>
-                
-                {/* Map Placeholder */}
-                <div className="w-full h-48 bg-muted rounded border border-border flex items-center justify-center">
-                  <span className="text-muted-foreground text-sm uppercase tracking-widest">מפה</span>
-                </div>
+              <div className="w-full h-32 bg-background rounded border border-border flex items-center justify-center mt-8">
+                <span className="text-muted-foreground text-sm uppercase tracking-widest">מפה</span>
               </div>
             </div>
 
-            <div className="bg-card p-8 border border-border/50 shadow-sm">
+            <div className="md:col-span-2 bg-card p-8 md:p-12 border border-border shadow-sm rounded-lg">
               {isSubmitted ? (
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="h-full flex flex-col items-center justify-center text-center py-20"
                 >
-                  <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
+                  <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                   </div>
                   <h3 className="text-2xl font-bold mb-2">ההודעה התקבלה</h3>
                   <p className="text-muted-foreground">תודה, {form.getValues().name}. נדבר בקרוב.</p>
-                  <Button variant="outline" className="mt-8" onClick={() => setIsSubmitted(false)}>שלח הודעה נוספת</Button>
+                  <Button variant="outline" className="mt-8 border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => setIsSubmitted(false)}>שלח הודעה נוספת</Button>
                 </motion.div>
               ) : (
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 text-right">
                     <FormField
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>שם מלא</FormLabel>
+                          <FormLabel className="text-foreground/80">שם מלא</FormLabel>
                           <FormControl>
-                            <Input placeholder="ישראל ישראלי" {...field} />
+                            <Input placeholder="ישראל ישראלי" {...field} className="bg-background" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -114,9 +115,9 @@ export function Contact() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>אימייל</FormLabel>
+                          <FormLabel className="text-foreground/80">אימייל</FormLabel>
                           <FormControl>
-                            <Input placeholder="israel@example.com" {...field} />
+                            <Input placeholder="israel@example.com" {...field} className="bg-background" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -128,10 +129,10 @@ export function Contact() {
                         name="type"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>סוג פרויקט</FormLabel>
+                            <FormLabel className="text-foreground/80">סוג פרויקט</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="bg-background">
                                   <SelectValue placeholder="בחר" />
                                 </SelectTrigger>
                               </FormControl>
@@ -152,10 +153,10 @@ export function Contact() {
                         name="budget"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>תקציב משוער</FormLabel>
+                            <FormLabel className="text-foreground/80">תקציב משוער</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="bg-background">
                                   <SelectValue placeholder="אופציונלי" />
                                 </SelectTrigger>
                               </FormControl>
@@ -176,21 +177,20 @@ export function Contact() {
                       name="message"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>הודעה</FormLabel>
+                          <FormLabel className="text-foreground/80">הודעה</FormLabel>
                           <FormControl>
-                            <Textarea placeholder="ספר לי קצת על הפרויקט..." className="min-h-[120px]" {...field} />
+                            <Textarea placeholder="ספר לי קצת על הפרויקט..." className="min-h-[120px] bg-background" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">שלח הודעה</Button>
+                    <Button type="submit" size="lg" className="w-full text-lg font-bold bg-primary text-primary-foreground hover:bg-primary/90">שלח הודעה</Button>
                   </form>
                 </Form>
               )}
             </div>
           </div>
-        </div>
       </div>
     </Layout>
   );

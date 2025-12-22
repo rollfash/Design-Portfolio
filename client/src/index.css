@@ -5,7 +5,7 @@
 
 @theme inline {
   --font-sans: 'Heebo', sans-serif;
-  --font-serif: 'Heebo', sans-serif; /* Using Heebo for everything for a more direct/masculine feel, or could use a serif Hebrew font like Frank Ruhl Libre if needed, but Heebo is very clean/modern */
+  --font-serif: 'Heebo', sans-serif;
   
   --radius-sm: 0.2rem;
   --radius-md: 0.3rem;
@@ -40,7 +40,7 @@
   --color-ring: hsl(var(--ring));
 }
 
-/* Light Mode (Default) - Muted Neutrals */
+/* Light Mode (Default) */
 :root {
   /* Warm Off-White Background */
   --background: 60 10% 98%; 
@@ -54,21 +54,21 @@
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 18%;
 
-  /* Elegant Charcoal Primary */
-  --primary: 0 0% 18%;
-  --primary-foreground: 60 10% 98%;
+  /* Deep Teal Accent for Primary Elements */
+  --primary: 185 45% 30%;
+  --primary-foreground: 0 0% 100%;
 
   /* Soft Beige/Warm Gray Secondary */
   --secondary: 40 10% 94%;
-  --secondary-foreground: 0 0% 18%;
+  --secondary-foreground: 185 45% 20%;
 
   /* Muted Text */
   --muted: 60 5% 90%;
   --muted-foreground: 0 0% 45%;
 
   /* Subtle Accent */
-  --accent: 40 10% 94%;
-  --accent-foreground: 0 0% 18%;
+  --accent: 185 30% 94%;
+  --accent-foreground: 185 45% 30%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 10% 98%;
@@ -76,12 +76,12 @@
   /* Light Border */
   --border: 0 0% 88%;
   --input: 0 0% 88%;
-  --ring: 0 0% 18%;
+  --ring: 185 45% 30%;
 
   --radius: 0.25rem;
 }
 
-/* Dark Mode - Deep Charcoal & Warm Gray */
+/* Dark Mode */
 .dark {
   --background: 0 0% 12%;
   --foreground: 60 10% 98%;
@@ -92,8 +92,9 @@
   --popover: 0 0% 15%;
   --popover-foreground: 60 10% 98%;
 
-  --primary: 60 10% 98%;
-  --primary-foreground: 0 0% 18%;
+  /* Lighter Teal for Dark Mode */
+  --primary: 185 45% 50%;
+  --primary-foreground: 0 0% 12%;
 
   --secondary: 0 0% 18%;
   --secondary-foreground: 60 10% 98%;
@@ -101,15 +102,15 @@
   --muted: 0 0% 20%;
   --muted-foreground: 0 0% 65%;
 
-  --accent: 0 0% 18%;
-  --accent-foreground: 60 10% 98%;
+  --accent: 185 45% 20%;
+  --accent-foreground: 185 45% 60%;
 
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 60 10% 98%;
 
   --border: 0 0% 25%;
   --input: 0 0% 25%;
-  --ring: 0 0% 80%;
+  --ring: 185 45% 50%;
 }
 
 @layer base {
