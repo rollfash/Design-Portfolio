@@ -48,9 +48,9 @@ export function Portfolio() {
             <button
               key={filter.id}
               onClick={() => setActiveFilter(filter.id)}
-              className={`text-sm uppercase tracking-widest px-4 py-2 transition-all duration-300 rounded-full ${
+              className={`text-sm uppercase tracking-widest px-4 py-2 transition-all duration-300 rounded-sm ${
                 activeFilter === filter.id 
-                  ? "bg-primary text-primary-foreground font-semibold" 
+                  ? "bg-primary text-primary-foreground font-semibold shadow-sm" 
                   : "text-muted-foreground hover:text-primary bg-secondary/30 hover:bg-secondary"
               }`}
             >
@@ -62,7 +62,7 @@ export function Portfolio() {
         {/* Grid */}
         <motion.div 
           layout
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl"
         >
           <AnimatePresence>
             {filteredProjects.map((project) => (

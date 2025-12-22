@@ -59,7 +59,7 @@ export function ProjectDetail() {
           </div>
 
           {/* Details Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20 border-y border-border py-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20 border-y border-border py-8 text-center bg-secondary/10">
              <div>
                 <h4 className="font-semibold text-sm uppercase tracking-wider mb-2 text-primary">מיקום</h4>
                 <p className="text-muted-foreground">{project.location}</p>
