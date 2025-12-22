@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useProjects } from "@/lib/project-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Plus, Edit2, Save, X, Image as ImageIcon } from "lucide-react";
+import { Trash2, Plus, Edit2, Save, X, Upload } from "lucide-react";
 import { Project } from "@/data/projects";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,6 +18,7 @@ export function Admin() {
   const { toast } = useToast();
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Simple mock login
   const handleLogin = (e: React.FormEvent) => {
@@ -45,6 +46,17 @@ export function Admin() {
     }
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && editingProject) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditingProject({ ...editingProject, image: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const startEdit = (project: Project) => {
     setEditingProject({ ...project });
     setIsAddingNew(false);
@@ -55,7 +67,7 @@ export function Admin() {
       id: `new-project-${Date.now()}`,
       title: "",
       category: "מגורים",
-      image: "", // In a real app, this would be an upload. Here we'd need a URL or text input.
+      image: "",
       year: new Date().getFullYear().toString(),
       location: "",
       role: "",
@@ -176,11 +188,20 @@ export function Admin() {
                       </div>
                       <div className="space-y-2">
                         <Label>קטגוריה</Label>
-                         <Input 
+                        <Select 
                           value={editingProject.category} 
-                          onChange={(e) => setEditingProject({...editingProject, category: e.target.value})}
-                          required
-                        />
+                          onValueChange={(value) => setEditingProject({...editingProject, category: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="בחר קטגוריה" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="מגורים">מגורים</SelectItem>
+                            <SelectItem value="מסחרי">מסחרי</SelectItem>
+                            <SelectItem value="עיצוב סט">עיצוב סט</SelectItem>
+                            <SelectItem value="סטיילינג">סטיילינג</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-2">
                         <Label>שנה</Label>
@@ -215,20 +236,34 @@ export function Admin() {
                     </div>
 
                     <div className="space-y-2">
-                       <Label>כתובת תמונה ראשית (URL)</Label>
-                       <div className="flex gap-2">
-                         <Input 
-                            value={editingProject.image} 
-                            onChange={(e) => setEditingProject({...editingProject, image: e.target.value})}
-                            placeholder="/assets/..."
-                         />
-                         {editingProject.image && (
-                           <div className="w-10 h-10 rounded overflow-hidden border border-border bg-muted shrink-0">
-                             <img src={editingProject.image} alt="Preview" className="w-full h-full object-cover" />
-                           </div>
-                         )}
+                       <Label>תמונה ראשית</Label>
+                       <div className="flex flex-col gap-4">
+                         <div className="flex items-center gap-4">
+                            {editingProject.image && (
+                              <div className="w-32 h-20 rounded overflow-hidden border border-border bg-muted shrink-0">
+                                <img src={editingProject.image} alt="Preview" className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
+                                ref={fileInputRef}
+                              />
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => fileInputRef.current?.click()}
+                                className="w-full border-dashed border-2 h-20 hover:border-primary hover:bg-primary/5"
+                              >
+                                <Upload className="mr-2 h-4 w-4" /> 
+                                {editingProject.image ? "החלף תמונה" : "בחר תמונה מהמחשב"}
+                              </Button>
+                            </div>
+                         </div>
                        </div>
-                       <p className="text-xs text-muted-foreground">הערה: במערכת הדגמה זו, נא להזין נתיב לתמונה קיימת או כתובת URL חיצונית.</p>
                     </div>
 
                     <div className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
