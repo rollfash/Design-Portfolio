@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { ProjectCard } from "@/components/ui/ProjectCard";
+import { HorizontalGallery } from "@/components/ui/HorizontalGallery";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react"; 
 import { Link } from "wouter";
@@ -10,8 +11,8 @@ import { useLanguage } from "@/lib/language-context";
 export function Home() {
   const { projects } = useProjects();
   const { t, language, direction } = useLanguage();
-  // Take first 4 projects for the homepage
-  const featuredProjects = projects.slice(0, 4);
+  // Take featured projects
+  const featuredProjects = projects.slice(0, 6); // Take up to 6 for the horizontal scroll
   const ArrowIcon = direction === 'rtl' ? ArrowLeft : ArrowRight;
 
   return (
@@ -72,43 +73,8 @@ export function Home() {
         </motion.div>
       </section>
 
-      {/* Featured Projects */}
-      <section className="py-24 bg-background border-t border-border">
-        <div className="container px-6 max-w-[1920px] flex flex-col items-center mx-auto">
-          <div className="text-center mb-16 max-w-2xl">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("home.featured.title")}</h2>
-            <div className="w-12 h-[2px] bg-primary/30 mx-auto mb-6"></div>
-            <p className="text-muted-foreground text-lg">{t("home.featured.subtitle")}</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-20 w-full max-w-7xl mb-16">
-            {featuredProjects.map((project, index) => {
-              // Create a localized version of the project object for display
-              const localizedProject = {
-                ...project,
-                title: language === 'en' && project.titleEn ? project.titleEn : project.title,
-                category: language === 'en' && project.categoryEn ? project.categoryEn : project.category,
-              };
-
-              return (
-                <ProjectCard 
-                  key={project.id} 
-                  {...localizedProject} 
-                  className={index % 2 === 1 ? "md:translate-y-20" : ""}
-                />
-              );
-            })}
-          </div>
-          
-          <div className="text-center mt-8">
-            <Link href="/portfolio">
-              <Button variant="outline" className="px-8 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground gap-2">
-                {t("home.featured.viewAll")} <ArrowIcon className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Horizontal Gallery Section */}
+      <HorizontalGallery projects={featuredProjects} />
 
       {/* Services Preview */}
       <section className="py-24 bg-secondary/30 border-t border-border">
