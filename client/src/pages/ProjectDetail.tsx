@@ -57,15 +57,30 @@ export function ProjectDetail() {
 
           {/* Image Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-24">
-            {gallery.map((img: string, i: number) => (
-              <div key={i} className={`relative group overflow-hidden ${i === 0 ? "md:col-span-2 aspect-video" : "aspect-[4/5]"}`}>
-                 <img 
-                   src={img} 
-                   alt={`Project detail ${i+1}`} 
-                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                 />
-              </div>
-            ))}
+            {gallery.map((media: string, i: number) => {
+               // Simple check for video (in a real app, we'd use better type checking or file extensions)
+               const isVideo = media.startsWith("data:video") || media.endsWith(".mp4") || media.endsWith(".webm");
+               
+               return (
+                  <div key={i} className={`relative group overflow-hidden ${i === 0 ? "md:col-span-2 aspect-video" : "aspect-[4/5]"}`}>
+                     {isVideo ? (
+                        <video 
+                           src={media} 
+                           className="w-full h-full object-cover"
+                           controls
+                           muted
+                           loop
+                        />
+                     ) : (
+                        <img 
+                           src={media} 
+                           alt={`Project detail ${i+1}`} 
+                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                     )}
+                  </div>
+               );
+            })}
           </div>
 
           {/* Navigation */}

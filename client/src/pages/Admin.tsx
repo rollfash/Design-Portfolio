@@ -19,6 +19,7 @@ export function Admin() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   // Simple mock login
   const handleLogin = (e: React.FormEvent) => {
@@ -55,6 +56,32 @@ export function Admin() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && editingProject) {
+       Array.from(files).forEach(file => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+             // We need to use functional update to ensure we don't overwrite concurrent reads
+             setEditingProject(prev => {
+                if (!prev) return null;
+                const newGallery = [...(prev.gallery || []), reader.result as string];
+                return { ...prev, gallery: newGallery };
+             });
+          };
+          reader.readAsDataURL(file);
+       });
+    }
+  };
+
+  const removeGalleryItem = (index: number) => {
+     if (editingProject && editingProject.gallery) {
+        const newGallery = [...editingProject.gallery];
+        newGallery.splice(index, 1);
+        setEditingProject({ ...editingProject, gallery: newGallery });
+     }
   };
 
   const startEdit = (project: Project) => {
@@ -263,6 +290,55 @@ export function Admin() {
                               </Button>
                             </div>
                          </div>
+                       </div>
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-border">
+                       <Label>גלריית תמונות ווידאו</Label>
+                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {editingProject.gallery && editingProject.gallery.map((item, index) => {
+                             const isVideo = item.startsWith("data:video");
+                             return (
+                               <div key={index} className="relative aspect-square group rounded overflow-hidden border border-border bg-muted">
+                                  {isVideo ? (
+                                     <video src={item} className="w-full h-full object-cover" />
+                                  ) : (
+                                     <img src={item} alt="" className="w-full h-full object-cover" />
+                                  )}
+                                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                     <Button 
+                                       type="button" 
+                                       variant="destructive" 
+                                       size="icon"
+                                       className="h-8 w-8"
+                                       onClick={() => removeGalleryItem(index)}
+                                     >
+                                        <Trash2 className="h-4 w-4" />
+                                     </Button>
+                                  </div>
+                               </div>
+                             );
+                          })}
+                          
+                          <div className="aspect-square">
+                             <input
+                                type="file"
+                                accept="image/*,video/*"
+                                multiple
+                                onChange={handleGalleryUpload}
+                                className="hidden"
+                                ref={galleryInputRef}
+                              />
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => galleryInputRef.current?.click()}
+                                className="w-full h-full border-dashed border-2 flex flex-col gap-2 hover:border-primary hover:bg-primary/5"
+                              >
+                                <Plus className="h-6 w-6" /> 
+                                <span>הוסף מדיה</span>
+                              </Button>
+                          </div>
                        </div>
                     </div>
 
