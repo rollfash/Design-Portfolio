@@ -3,17 +3,19 @@ import { ProjectCard } from "@/components/ui/ProjectCard";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProjects } from "@/lib/project-context";
-
-const FILTERS = [
-  { id: "All", label: "הכל" },
-  { id: "מגורים", label: "מגורים" },
-  { id: "מסחרי", label: "מסחרי" },
-  { id: "עיצוב סט", label: "עיצוב סט" }
-];
+import { useLanguage } from "@/lib/language-context";
 
 export function Portfolio() {
   const { projects } = useProjects();
+  const { t, language } = useLanguage();
   const [activeFilter, setActiveFilter] = useState("All");
+
+  const FILTERS = [
+    { id: "All", label: t("filter.all"), originalId: "All" },
+    { id: "מגורים", label: t("filter.residential"), originalId: "מגורים" },
+    { id: "מסחרי", label: t("filter.commercial"), originalId: "מסחרי" },
+    { id: "עיצוב סט", label: t("filter.set_design"), originalId: "עיצוב סט" }
+  ];
 
   const filteredProjects = activeFilter === "All" 
     ? projects 
@@ -21,11 +23,11 @@ export function Portfolio() {
 
   return (
     <Layout>
-      <div className="container px-6 pt-12 pb-24 flex flex-col items-center">
+      <div className="container px-6 max-w-[1920px] pt-12 pb-24 flex flex-col items-center mx-auto">
         <div className="text-center mb-16 max-w-3xl">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">עבודות נבחרות</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">{t("portfolio.title")}</h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            אוסף חללים נבחרים שתוכננו למגורים, עבודה והופעה.
+            {t("portfolio.subtitle")}
           </p>
         </div>
 
@@ -34,9 +36,9 @@ export function Portfolio() {
           {FILTERS.map((filter) => (
             <button
               key={filter.id}
-              onClick={() => setActiveFilter(filter.id)}
+              onClick={() => setActiveFilter(filter.originalId)}
               className={`text-sm uppercase tracking-widest px-4 py-2 transition-all duration-300 rounded-sm ${
-                activeFilter === filter.id 
+                activeFilter === filter.originalId 
                   ? "bg-primary text-primary-foreground font-semibold shadow-sm" 
                   : "text-muted-foreground hover:text-primary bg-secondary/30 hover:bg-secondary"
               }`}
@@ -52,18 +54,26 @@ export function Portfolio() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-7xl"
         >
           <AnimatePresence>
-            {filteredProjects.map((project) => (
-              <motion.div
-                key={project.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ProjectCard {...project} />
-              </motion.div>
-            ))}
+            {filteredProjects.map((project) => {
+              const localizedProject = {
+                ...project,
+                title: language === 'en' && project.titleEn ? project.titleEn : project.title,
+                category: language === 'en' && project.categoryEn ? project.categoryEn : project.category,
+              };
+
+              return (
+                <motion.div
+                  key={project.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ProjectCard {...localizedProject} />
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </motion.div>
       </div>

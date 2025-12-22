@@ -1,20 +1,26 @@
 import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X, Moon, Sun, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/lib/language-context";
 
 export function Navbar() {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const { language, setLanguage, t } = useLanguage();
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     document.documentElement.classList.toggle('dark');
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'he' ? 'en' : 'he');
   };
 
   useEffect(() => {
@@ -26,11 +32,11 @@ export function Navbar() {
   }, []);
 
   const links = [
-    { href: "/", label: "בית" },
-    { href: "/portfolio", label: "עבודות" },
-    { href: "/services", label: "שירותים" },
-    { href: "/about", label: "אודות" },
-    { href: "/contact", label: "צור קשר" },
+    { href: "/", label: t("nav.home") },
+    { href: "/portfolio", label: t("nav.portfolio") },
+    { href: "/services", label: t("nav.services") },
+    { href: "/about", label: t("nav.about") },
+    { href: "/contact", label: t("nav.contact") },
   ];
 
   return (
@@ -40,7 +46,7 @@ export function Navbar() {
         isScrolled ? "bg-background/80 backdrop-blur-md border-border py-4" : "bg-transparent py-6"
       )}
     >
-      <div className="container mx-auto px-6 flex items-center justify-between">
+      <div className="container mx-auto px-6 max-w-[1920px] flex items-center justify-between">
         <Link href="/">
           <a className="text-2xl font-bold tracking-tight z-50 relative">
             Gal Shinhorn
@@ -59,12 +65,26 @@ export function Navbar() {
               >
                 {link.label}
                 <span className={cn(
-                  "absolute -bottom-1 right-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full",
+                  "absolute -bottom-1 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full",
+                   language === 'he' ? "right-0" : "left-0",
                    location === link.href ? "w-full" : ""
                 )} />
               </a>
             </Link>
           ))}
+          
+          <div className="flex items-center gap-2 border-r border-border pr-4 mr-2 rtl:border-l rtl:border-r-0 rtl:pl-4 rtl:ml-2 rtl:pr-0">
+             <Button
+               variant="ghost"
+               size="sm"
+               onClick={toggleLanguage}
+               className="font-medium text-xs px-2 h-8"
+             >
+               <Globe className="h-3 w-3 mr-2 rtl:ml-2 rtl:mr-0" />
+               {language === 'he' ? 'EN' : 'עב'}
+             </Button>
+          </div>
+
           <Button
             variant="ghost"
             size="icon"
@@ -102,13 +122,15 @@ export function Navbar() {
                   </a>
                 </Link>
               ))}
-              <Button
-                variant="outline"
-                onClick={toggleTheme}
-                className="mt-4"
-              >
-                {theme === 'light' ? "מצב כהה" : "מצב בהיר"}
-              </Button>
+              
+              <div className="flex gap-4 mt-4">
+                 <Button variant="outline" onClick={toggleLanguage}>
+                    {language === 'he' ? 'Switch to English' : 'עבור לעברית'}
+                 </Button>
+                 <Button variant="outline" onClick={toggleTheme}>
+                   {theme === 'light' ? t("nav.mode.dark") : t("nav.mode.light")}
+                 </Button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

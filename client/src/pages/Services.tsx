@@ -1,40 +1,43 @@
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Check, Lightbulb, PenTool, Home as HomeIcon } from "lucide-react";
+import { Check, Lightbulb, PenTool, Home as HomeIcon, ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
+import { useLanguage } from "@/lib/language-context";
 
 export function Services() {
+  const { t, direction } = useLanguage();
+  const ArrowIcon = direction === 'rtl' ? ArrowLeft : ArrowRight;
+
   const services = [
     {
-      title: "עיצוב פנים למגורים",
-      description: "שירותי עיצוב מלאים לבתים, מתכנון שיפוץ ועד בחירת הריהוט.",
-      features: ["תכנון חלל", "בחירת חומרים", "ריהוט בהתאמה אישית", "ניהול פרויקט"]
+      title: t("service.residential.title"),
+      description: t("service.residential.desc"),
+      features: [t("feature.space_planning"), t("feature.materials"), t("feature.custom_furniture"), t("feature.project_mgmt")]
     },
     {
-      title: "עיצוב סטים והפקה",
-      description: "יצירת סביבות סוחפות לקולנוע, טלוויזיה, פרסומות ואירועי מותג.",
-      features: ["פיתוח קונספט", "הדמיות תלת מימד", "רכש אביזרים", "סטיילינג על הסט"]
+      title: t("service.set_design.title"),
+      description: t("service.set_design.desc"),
+      features: [t("feature.concept"), t("feature.3d"), t("feature.props"), t("feature.set_styling")]
     },
     {
-      title: "חללים מסחריים",
-      description: "עיצוב סביבות מותג לחנויות, אירוח ומשרדים.",
-      features: ["אינטגרציית מותג", "זרימת לקוחות", "עיצוב תאורה", "ליווי רישוי"]
+      title: t("service.commercial.title"),
+      description: t("service.commercial.desc"),
+      features: [t("feature.brand"), t("feature.flow"), t("feature.lighting"), t("feature.permits")]
     },
     {
-      title: "ייעוץ וסטיילינג",
-      description: "עין מקצועית לגימורים, אוצרות אמנות ואופטימיזציה של החלל.",
-      features: ["ניהול אומנותי", "רכש דקורציה", "ייעוץ צבע", "הום סטיילינג"]
+      title: t("service.styling.title"),
+      description: t("service.styling.desc"),
+      features: [t("feature.art"), t("feature.decor"), t("feature.color"), t("feature.home_styling")]
     }
   ];
 
   return (
     <Layout>
-       <div className="container px-6 py-20 flex flex-col items-center">
+       <div className="container px-6 max-w-[1920px] py-20 flex flex-col items-center mx-auto">
          <div className="max-w-3xl mx-auto text-center mb-20">
-           <h1 className="text-4xl md:text-6xl font-bold mb-6">שירותים</h1>
+           <h1 className="text-4xl md:text-6xl font-bold mb-6">{t("services.hero.title")}</h1>
            <p className="text-muted-foreground text-lg">
-             אני מציע מגוון שירותי עיצוב המותאמים אישית לצרכים שלך.
-             בין אם מדובר בשדרוג חדר בודד או בבניית מתחם מסחרי שלם, אני ניגש לכל פרויקט באותה רמת דיוק.
+             {t("services.hero.subtitle")}
            </p>
          </div>
 
@@ -43,9 +46,9 @@ export function Services() {
             <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-[1px] bg-border z-0" />
             
             {[
-              { icon: Lightbulb, title: "גילוי", desc: "מתחילים בהבנת החזון, הצרכים והאילוצים הייחודיים של החלל." },
-              { icon: PenTool, title: "עיצוב", desc: "פיתוח קונספטים, הדמיות ופלטות חומרים כדי להפיח חיים בחזון." },
-              { icon: HomeIcon, title: "ביצוע", desc: "ניהול הביצוע, הרכש וההתקנה להבטחת תוצאה מושלמת." }
+              { icon: Lightbulb, title: t("services.process.discover"), desc: t("services.process.discover.desc") },
+              { icon: PenTool, title: t("services.process.design"), desc: t("services.process.design.desc") },
+              { icon: HomeIcon, title: t("services.process.execute"), desc: t("services.process.execute.desc") }
             ].map((step, i) => (
               <div key={i} className="relative z-10 bg-background md:bg-transparent text-center px-4 flex flex-col items-center">
                 <div className="w-24 h-24 mx-auto bg-secondary rounded-full flex items-center justify-center mb-6 text-primary">
@@ -66,22 +69,22 @@ export function Services() {
                <ul className="space-y-3 mb-8 w-full">
                  {service.features.map((feature) => (
                    <li key={feature} className="flex items-center justify-center text-sm">
-                     <Check className="h-4 w-4 ml-3 text-primary" /> {feature}
+                     <Check className="h-4 w-4 mx-3 text-primary" /> {feature}
                    </li>
                  ))}
                </ul>
                <Link href="/contact">
-                 <Button variant="outline" className="w-full md:w-auto md:px-12 border-primary text-primary hover:bg-primary hover:text-primary-foreground">לפרטים נוספים</Button>
+                 <Button variant="outline" className="w-full md:w-auto md:px-12 border-primary text-primary hover:bg-primary hover:text-primary-foreground">{t("services.more_info")}</Button>
                </Link>
              </div>
            ))}
          </div>
 
          <div className="bg-primary text-primary-foreground p-12 md:p-24 text-center rounded-sm w-full max-w-6xl">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">מוכנים לשדרג את החלל?</h2>
-            <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">בואו נדבר על הפרויקט שלכם ונראה איך אפשר להפוך את החזון למציאות.</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">{t("services.cta.title")}</h2>
+            <p className="text-primary-foreground/80 mb-8 max-w-xl mx-auto">{t("services.cta.subtitle")}</p>
             <Link href="/contact">
-              <Button size="lg" variant="secondary" className="px-12 font-bold text-primary">תיאום פגישת ייעוץ</Button>
+              <Button size="lg" variant="secondary" className="px-12 font-bold text-primary">{t("services.cta.button")}</Button>
             </Link>
          </div>
        </div>
