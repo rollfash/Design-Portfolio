@@ -30,25 +30,41 @@ export function Home() {
         />
         
         <div className="container px-6 z-10 relative text-center flex flex-col items-center">
-          <motion.div
-             initial={{ opacity: 0, y: 20 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.6 }}
-             className="inline-block mb-6 px-4 py-1.5 border border-primary/20 rounded-full bg-background/50 backdrop-blur-sm"
-          >
-            <p className="text-sm font-bold tracking-widest uppercase text-primary">
-              עיצוב פנים וסטים
-            </p>
-          </motion.div>
-          
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl md:text-7xl lg:text-9xl font-bold leading-[1.1] mb-8"
+            className="text-5xl md:text-7xl font-bold leading-[1.1] mb-12"
           >
-            חללים שמספרים <br className="hidden md:block"/> סיפור
+            Gal shinhorn
           </motion.h1>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="max-w-4xl mx-auto space-y-10 mb-12"
+          >
+            {/* English Block - LTR */}
+            <div dir="ltr" className="text-center text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
+              <p className="mb-4">
+                Gal Shinhorn Studio is a design firm that specializes in representative spaces, experience spaces, and exhibitions. We've been in business for over 20 years and have helped many clients create powerful and impactful spaces.
+              </p>
+              <p>
+                Our team of experienced designers are passionate about creating projects that are both visually stunning and functional. We believe in taking a holistic approach to design, and strive to create spaces that are both aesthetically pleasing and emotionally resonant. With our unique blend of creativity and technical expertise, we are sure to make your vision come to life.
+              </p>
+            </div>
+
+            {/* Hebrew Block - RTL */}
+            <div dir="rtl" className="text-center text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
+              <p className="mb-4">
+                סטודיו גל שינהורן הינו משרד עיצוב המתמחה בחללים ייצוגיים, חללי חוויה ותערוכות. אנו עוסקים יותר מ-20 שנה ועזרנו ללקוחות רבים ליצור חללים עוצמתיים ומשפיעים.
+              </p>
+              <p>
+                צוות המעצבים המנוסים שלנו נלהב ליצור פרויקטים שהם גם מדהימים ויזואלית וגם פונקציונליים. אנו מאמינים בגישה הוליסטית לעיצוב, ושואפים ליצור חללים שהם גם אסתטיים וגם מהדהדים רגשית. עם השילוב הייחודי שלנו של יצירתיות ומומחיות טכנית, אנו בטוחים שנגרום לחזון שלך להתעורר לחיים.
+              </p>
+            </div>
+          </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
