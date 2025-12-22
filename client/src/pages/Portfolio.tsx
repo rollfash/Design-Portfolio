@@ -2,7 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { projects } from "@/data/projects"; // Import centralized data
+import { useProjects } from "@/lib/project-context";
 
 const FILTERS = [
   { id: "All", label: "הכל" },
@@ -12,6 +12,7 @@ const FILTERS = [
 ];
 
 export function Portfolio() {
+  const { projects } = useProjects();
   const [activeFilter, setActiveFilter] = useState("All");
 
   const filteredProjects = activeFilter === "All" 

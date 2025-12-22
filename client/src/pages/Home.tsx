@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react"; 
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { projects } from "@/data/projects"; // Import centralized data
+import { useProjects } from "@/lib/project-context";
 
 // Asset imports
 import heroBg from "@assets/generated_images/subtle_textured_noise_gradient_background.png";
 
 export function Home() {
+  const { projects } = useProjects();
   // Take first 4 projects for the homepage
   const featuredProjects = projects.slice(0, 4);
 

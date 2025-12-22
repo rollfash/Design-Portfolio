@@ -3,10 +3,11 @@ import { useParams } from "wouter";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft } from "lucide-react"; 
-import { projects } from "@/data/projects";
+import { useProjects } from "@/lib/project-context";
 
 export function ProjectDetail() {
   const { id } = useParams();
+  const { projects } = useProjects();
   const project = projects.find(p => p.id === id) || projects[0];
 
   // Safely handle optional arrays
