@@ -2,21 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Asset imports
-import stock1 from "@assets/stock_images/minimalist_interior__cce91859.jpg";
-import stock2 from "@assets/stock_images/modern_set_design_st_d7e6dca9.jpg";
-import stock3 from "@assets/stock_images/boutique_hotel_lobby_961ec732.jpg";
-import stock4 from "@assets/stock_images/architectural_detail_6a7295b9.jpg";
-
-const ALL_PROJECTS = [
-  { id: "desert-loft", title: "שיפוץ לופט במדבר", category: "מגורים", image: stock1, year: "2024" },
-  { id: "studio-talk", title: "סט תוכנית אירוח", category: "עיצוב סט", image: stock2, year: "2023" },
-  { id: "hotel-lobby", title: "לובי מלון בוטיק", category: "מסחרי", image: stock3, year: "2024" },
-  { id: "concrete-villa", title: "וילת בטון", category: "מגורים", image: stock4, year: "2023" },
-  { id: "minimal-office", title: "משרדי הייטק", category: "מסחרי", image: stock1, year: "2023" },
-  { id: "fashion-shoot", title: "סט צילומי אופנה", category: "עיצוב סט", image: stock2, year: "2022" },
-];
+import { projects } from "@/data/projects"; // Import centralized data
 
 const FILTERS = [
   { id: "All", label: "הכל" },
@@ -29,8 +15,8 @@ export function Portfolio() {
   const [activeFilter, setActiveFilter] = useState("All");
 
   const filteredProjects = activeFilter === "All" 
-    ? ALL_PROJECTS 
-    : ALL_PROJECTS.filter(p => p.category === activeFilter);
+    ? projects 
+    : projects.filter(p => p.category === activeFilter);
 
   return (
     <Layout>

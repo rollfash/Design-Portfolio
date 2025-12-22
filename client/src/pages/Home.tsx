@@ -4,22 +4,15 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react"; 
 import { Link } from "wouter";
 import { motion } from "framer-motion";
+import { projects } from "@/data/projects"; // Import centralized data
 
 // Asset imports
-import stock1 from "@assets/stock_images/minimalist_interior__cce91859.jpg";
-import stock2 from "@assets/stock_images/modern_set_design_st_d7e6dca9.jpg";
-import stock3 from "@assets/stock_images/boutique_hotel_lobby_961ec732.jpg";
-import stock4 from "@assets/stock_images/architectural_detail_6a7295b9.jpg";
-// We don't use the hero bg image anymore, we rely on the CSS grid background
-
-const PROJECTS = [
-  { id: "desert-loft", title: "שיפוץ לופט במדבר", category: "מגורים", image: stock1, year: "2024" },
-  { id: "studio-talk", title: "סט תוכנית אירוח", category: "עיצוב סט", image: stock2, year: "2023" },
-  { id: "hotel-lobby", title: "לובי מלון בוטיק", category: "מסחרי", image: stock3, year: "2024" },
-  { id: "concrete-villa", title: "וילת בטון", category: "מגורים", image: stock4, year: "2023" },
-];
+import heroBg from "@assets/generated_images/subtle_textured_noise_gradient_background.png";
 
 export function Home() {
+  // Take first 4 projects for the homepage
+  const featuredProjects = projects.slice(0, 4);
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -121,7 +114,7 @@ export function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-20 w-full max-w-6xl mb-16">
-            {PROJECTS.map((project, index) => (
+            {featuredProjects.map((project, index) => (
               <ProjectCard 
                 key={project.id} 
                 {...project} 

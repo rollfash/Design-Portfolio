@@ -3,41 +3,15 @@ import { useParams } from "wouter";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft } from "lucide-react"; 
-
-// Asset imports
-import stock1 from "@assets/stock_images/minimalist_interior__cce91859.jpg";
-import stock2 from "@assets/stock_images/modern_set_design_st_d7e6dca9.jpg";
-import stock3 from "@assets/stock_images/boutique_hotel_lobby_961ec732.jpg";
-import stock4 from "@assets/stock_images/architectural_detail_6a7295b9.jpg";
-
-const PROJECTS = {
-  "desert-loft": {
-    title: "שיפוץ לופט במדבר",
-    category: "מגורים",
-    location: "מצפה רמון, ישראל",
-    year: "2024",
-    role: "מעצב ראשי",
-    description: "שיפוץ מלא של מבנה מדברי משנות ה-70 והפיכתו למקום מפלט מינימליסטי. העיצוב מתמקד בחומרים גולמיים, אור טבעי וחיבור ישיר לנוף המדברי. השתמשנו בבטון חשוף, עץ ממוחזר ופלטת צבעים שקטה כדי ליצור תחושת רוגע ובידוד.",
-    services: ["תכנון פנים", "עיצוב ריהוט", "סטיילינג"],
-    images: [stock1, stock4, stock1, stock4, stock1, stock4] 
-  },
-  "studio-talk": {
-    title: "סט תוכנית אירוח",
-    category: "עיצוב סט",
-    location: "תל אביב, ישראל",
-    year: "2023",
-    role: "מעצב הפקה",
-    description: "עיצוב הסט המרכזי לתוכנית לייט-נייט חדשה. המטרה הייתה ליצור סביבה אינטימית אך ויזואלית מרשימה שעוברת מסך היטב מכל זווית. השתמשנו באלמנטים מודולריים ותאורת LED ניתנת לתכנות כדי לשנות את האווירה בין הסגמנטים השונים.",
-    services: ["עיצוב סט", "תכנון תאורה", "רכש אביזרים"],
-    images: [stock2, stock3, stock2, stock3, stock2, stock3]
-  },
-  // Fallback 
-};
+import { projects } from "@/data/projects";
 
 export function ProjectDetail() {
   const { id } = useParams();
-  // @ts-ignore
-  const project = PROJECTS[id] || PROJECTS["desert-loft"];
+  const project = projects.find(p => p.id === id) || projects[0];
+
+  // Safely handle optional arrays
+  const gallery = project.gallery || [project.image];
+  const services = project.services || [];
 
   return (
     <Layout>
@@ -75,14 +49,14 @@ export function ProjectDetail() {
              <div>
                 <h4 className="font-semibold text-sm uppercase tracking-wider mb-2 text-primary">שירותים</h4>
                 <div className="text-muted-foreground flex flex-col">
-                  {project.services.map((s: string) => <span key={s}>{s}</span>)}
+                  {services.map((s: string) => <span key={s}>{s}</span>)}
                 </div>
              </div>
           </div>
 
           {/* Image Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-24">
-            {project.images.map((img: string, i: number) => (
+            {gallery.map((img: string, i: number) => (
               <div key={i} className={`relative group overflow-hidden ${i === 0 ? "md:col-span-2 aspect-video" : "aspect-[4/5]"}`}>
                  <img 
                    src={img} 
