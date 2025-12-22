@@ -1,7 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowLeft } from "lucide-react"; // RTL Arrow
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 
@@ -13,10 +13,10 @@ import stock4 from "@assets/stock_images/architectural_detail_6a7295b9.jpg";
 import heroBg from "@assets/generated_images/subtle_textured_noise_gradient_background.png";
 
 const PROJECTS = [
-  { id: "desert-loft", title: "Desert Loft Renovation", category: "Residential", image: stock1, year: "2024" },
-  { id: "studio-talk", title: "Studio Talk Show Set", category: "Set Design", image: stock2, year: "2023" },
-  { id: "hotel-lobby", title: "Boutique Hotel Lobby", category: "Commercial", image: stock3, year: "2024" },
-  { id: "concrete-villa", title: "Concrete Villa", category: "Residential", image: stock4, year: "2023" },
+  { id: "desert-loft", title: "שיפוץ לופט במדבר", category: "מגורים", image: stock1, year: "2024" },
+  { id: "studio-talk", title: "סט תוכנית אירוח", category: "עיצוב סט", image: stock2, year: "2023" },
+  { id: "hotel-lobby", title: "לובי מלון בוטיק", category: "מסחרי", image: stock3, year: "2024" },
+  { id: "concrete-villa", title: "וילת בטון", category: "מגורים", image: stock4, year: "2023" },
 ];
 
 export function Home() {
@@ -34,18 +34,18 @@ export function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-sm md:text-base tracking-[0.2em] uppercase text-muted-foreground mb-6"
+            className="text-base font-medium tracking-[0.2em] uppercase text-muted-foreground mb-6"
           >
-            Interior & Set Design
+            עיצוב פנים וסטים
           </motion.p>
           
           <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-5xl md:text-7xl lg:text-9xl font-serif font-medium leading-[1.1] mb-8"
+            className="text-5xl md:text-7xl lg:text-9xl font-bold leading-[1.1] mb-8"
           >
-            Designing Spaces <br className="hidden md:block"/> That Tell Stories
+            חללים שמספרים <br className="hidden md:block"/> סיפור
           </motion.h1>
 
           <motion.div 
@@ -56,12 +56,12 @@ export function Home() {
           >
              <Link href="/portfolio">
               <Button size="lg" className="rounded-none px-8 py-6 text-base bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
-                View Portfolio
+                לתיק העבודות
               </Button>
             </Link>
             <Link href="/contact">
               <Button size="lg" variant="outline" className="rounded-none px-8 py-6 text-base border-primary/20 hover:bg-secondary transition-all">
-                Book Consultation
+                תיאום פגישה
               </Button>
             </Link>
           </motion.div>
@@ -73,7 +73,7 @@ export function Home() {
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
         >
-          Scroll
+          גלילה
         </motion.div>
       </section>
 
@@ -82,12 +82,12 @@ export function Home() {
         <div className="container px-6">
           <div className="flex justify-between items-end mb-16">
             <div>
-              <h2 className="text-3xl md:text-4xl font-serif mb-2">Featured Work</h2>
-              <p className="text-muted-foreground">A selection of recent interior and set design projects.</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">עבודות נבחרות</h2>
+              <p className="text-muted-foreground">מבחר פרויקטים אחרונים בעיצוב פנים וסטים.</p>
             </div>
             <Link href="/portfolio">
               <a className="hidden md:flex items-center gap-2 text-sm font-semibold uppercase tracking-widest hover:text-primary/60 transition-colors">
-                View All <ArrowRight className="h-4 w-4" />
+                לכל העבודות <ArrowLeft className="h-4 w-4" />
               </a>
             </Link>
           </div>
@@ -104,7 +104,7 @@ export function Home() {
           
           <div className="mt-20 text-center md:hidden">
             <Link href="/portfolio">
-              <Button variant="outline" className="w-full">View All Projects</Button>
+              <Button variant="outline" className="w-full">לכל הפרויקטים</Button>
             </Link>
           </div>
         </div>
@@ -115,24 +115,24 @@ export function Home() {
         <div className="container px-6">
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
              <div className="lg:col-span-4">
-               <h2 className="text-3xl md:text-4xl font-serif mb-6">Services</h2>
+               <h2 className="text-3xl md:text-4xl font-bold mb-6">שירותים</h2>
                <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
-                 From concept to completion, we create immersive environments that elevate your brand or lifestyle.
+                 מהקונספט ועד הביצוע, אני יוצר סביבות שמעצימות את המותג או את חווית המגורים שלך.
                </p>
                <Link href="/services">
-                 <Button className="gap-2">Explore Services <ArrowRight className="h-4 w-4"/></Button>
+                 <Button className="gap-2">לכל השירותים <ArrowLeft className="h-4 w-4"/></Button>
                </Link>
              </div>
              
              <div className="lg:col-span-7 lg:col-start-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                {[
-                 { title: "Residential Design", desc: "Full-scale renovations and styling for private homes." },
-                 { title: "Set Design", desc: "Conceptual environments for film, photography, and events." },
-                 { title: "Commercial Spaces", desc: "Retail and hospitality design that engages customers." },
-                 { title: "Styling & Curation", desc: "Sourcing furniture, art, and decor for finishing touches." }
+                 { title: "עיצוב מגורים", desc: "שיפוצים מקיפים וסטיילינג לבתים פרטיים ודירות." },
+                 { title: "עיצוב סטים", desc: "סביבות קונספטואליות לצילומים, טלוויזיה ואירועים." },
+                 { title: "חללים מסחריים", desc: "עיצוב חנויות ומשרדים שמעוררים עניין ומחזקים מותג." },
+                 { title: "סטיילינג ואוצרות", desc: "בחירת ריהוט, אמנות ודקורציה להשלמת המראה." }
                ].map((service, i) => (
                  <div key={i} className="bg-background p-8 border border-border/50 hover:border-primary/20 transition-colors">
-                   <h3 className="text-xl font-serif mb-3">{service.title}</h3>
+                   <h3 className="text-xl font-bold mb-3">{service.title}</h3>
                    <p className="text-muted-foreground text-sm">{service.desc}</p>
                  </div>
                ))}

@@ -2,7 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { useParams } from "wouter";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react"; // RTL Arrows
 
 // Asset imports
 import stock1 from "@assets/stock_images/minimalist_interior__cce91859.jpg";
@@ -12,39 +12,39 @@ import stock4 from "@assets/stock_images/architectural_detail_6a7295b9.jpg";
 
 const PROJECTS = {
   "desert-loft": {
-    title: "Desert Loft Renovation",
-    category: "Residential",
-    location: "Joshua Tree, CA",
+    title: "שיפוץ לופט במדבר",
+    category: "מגורים",
+    location: "מצפה רמון, ישראל",
     year: "2024",
-    role: "Lead Interior Designer",
-    description: "A complete renovation of a 1970s desert cabin, transforming it into a minimalist retreat. The design focuses on raw materials, natural light, and a seamless connection to the arid landscape. We used locally sourced concrete, reclaimed wood, and a muted palette to create a sense of calm.",
-    services: ["Interior Architecture", "Custom Furniture Design", "Styling"],
+    role: "מעצב ראשי",
+    description: "שיפוץ מלא של מבנה מדברי משנות ה-70 והפיכתו למקום מפלט מינימליסטי. העיצוב מתמקד בחומרים גולמיים, אור טבעי וחיבור ישיר לנוף המדברי. השתמשנו בבטון חשוף, עץ ממוחזר ופלטת צבעים שקטה כדי ליצור תחושת רוגע ובידוד.",
+    services: ["תכנון פנים", "עיצוב ריהוט", "סטיילינג"],
     images: [stock1, stock4, stock1, stock4, stock1, stock4] 
   },
   "studio-talk": {
-    title: "Studio Talk Show Set",
-    category: "Set Design",
-    location: "Los Angeles, CA",
+    title: "סט תוכנית אירוח",
+    category: "עיצוב סט",
+    location: "תל אביב, ישראל",
     year: "2023",
-    role: "Production Designer",
-    description: "Designed the main set for a new late-night talk show. The goal was to create an intimate yet visually striking environment that looked great on camera from every angle. We utilized modular backdrop elements and programmable LED lighting to change the mood for different segments.",
-    services: ["Set Design", "Lighting Direction", "Prop Sourcing"],
+    role: "מעצב הפקה",
+    description: "עיצוב הסט המרכזי לתוכנית לייט-נייט חדשה. המטרה הייתה ליצור סביבה אינטימית אך ויזואלית מרשימה שעוברת מסך היטב מכל זווית. השתמשנו באלמנטים מודולריים ותאורת LED ניתנת לתכנות כדי לשנות את האווירה בין הסגמנטים השונים.",
+    services: ["עיצוב סט", "תכנון תאורה", "רכש אביזרים"],
     images: [stock2, stock3, stock2, stock3, stock2, stock3]
   },
-  // Fallback for others
+  // Fallback 
 };
 
 export function ProjectDetail() {
   const { id } = useParams();
   // @ts-ignore
-  const project = PROJECTS[id] || PROJECTS["desert-loft"]; // Fallback for demo
+  const project = PROJECTS[id] || PROJECTS["desert-loft"];
 
   return (
     <Layout>
       <div className="container px-6 pt-12 pb-24">
         <Link href="/portfolio">
           <a className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Back to Portfolio
+            <ArrowRight className="h-4 w-4 ml-2" /> חזרה לתיק העבודות
           </a>
         </Link>
 
@@ -52,26 +52,26 @@ export function ProjectDetail() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
           <div className="md:col-span-8">
             <span className="text-primary/60 uppercase tracking-widest text-sm block mb-4">{project.category}</span>
-            <h1 className="text-5xl md:text-7xl font-serif mb-8">{project.title}</h1>
-            <p className="text-xl leading-relaxed text-muted-foreground max-w-2xl">
+            <h1 className="text-5xl md:text-7xl font-bold mb-8">{project.title}</h1>
+            <p className="text-xl leading-relaxed text-muted-foreground max-w-2xl pl-8 border-r-2 border-border/50">
               {project.description}
             </p>
           </div>
-          <div className="md:col-span-4 flex flex-col justify-end space-y-6 md:pl-12 border-l border-border/50">
+          <div className="md:col-span-4 flex flex-col justify-end space-y-6 md:pr-12">
             <div>
-              <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Location</h4>
+              <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">מיקום</h4>
               <p className="text-muted-foreground">{project.location}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Year</h4>
+              <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">שנה</h4>
               <p className="text-muted-foreground">{project.year}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Role</h4>
+              <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">תפקיד</h4>
               <p className="text-muted-foreground">{project.role}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">Services</h4>
+              <h4 className="font-semibold text-sm uppercase tracking-wider mb-1">שירותים</h4>
               <ul className="text-muted-foreground list-none">
                 {project.services.map((s: string) => <li key={s}>{s}</li>)}
               </ul>
@@ -79,7 +79,7 @@ export function ProjectDetail() {
           </div>
         </div>
 
-        {/* Image Grid - Masonry style mockup */}
+        {/* Image Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-24">
           {project.images.map((img: string, i: number) => (
             <div key={i} className={`relative group overflow-hidden ${i === 0 ? "md:col-span-2 aspect-video" : "aspect-[4/5]"}`}>
@@ -96,12 +96,12 @@ export function ProjectDetail() {
         <div className="flex justify-between border-t border-border pt-12">
            <Link href="/portfolio">
              <Button variant="ghost" className="gap-2 text-muted-foreground">
-               <ArrowLeft className="h-4 w-4"/> Previous Project
+               <ArrowRight className="h-4 w-4"/> פרויקט קודם
              </Button>
            </Link>
            <Link href="/portfolio">
              <Button variant="ghost" className="gap-2">
-               Next Project <ArrowRight className="h-4 w-4"/>
+               פרויקט הבא <ArrowLeft className="h-4 w-4"/>
              </Button>
            </Link>
         </div>

@@ -11,7 +11,6 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  // Toggle theme helper
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
@@ -27,11 +26,11 @@ export function Navbar() {
   }, []);
 
   const links = [
-    { href: "/", label: "Home" },
-    { href: "/portfolio", label: "Portfolio" },
-    { href: "/services", label: "Services" },
-    { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
+    { href: "/", label: "בית" },
+    { href: "/portfolio", label: "עבודות" },
+    { href: "/services", label: "שירותים" },
+    { href: "/about", label: "אודות" },
+    { href: "/contact", label: "צור קשר" },
   ];
 
   return (
@@ -43,8 +42,8 @@ export function Navbar() {
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/">
-          <a className="text-2xl font-serif font-bold tracking-tight z-50 relative">
-            ELENA VANCE
+          <a className="text-2xl font-bold tracking-tight z-50 relative">
+            גל שינהורן
           </a>
         </Link>
 
@@ -54,13 +53,13 @@ export function Navbar() {
             <Link key={link.href} href={link.href}>
               <a
                 className={cn(
-                  "text-sm font-medium tracking-wide transition-colors hover:text-primary/70 relative group",
+                  "text-base font-medium transition-colors hover:text-primary/70 relative group",
                   location === link.href ? "text-primary" : "text-muted-foreground"
                 )}
               >
                 {link.label}
                 <span className={cn(
-                  "absolute -bottom-1 left-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full",
+                  "absolute -bottom-1 right-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full",
                    location === link.href ? "w-full" : ""
                 )} />
               </a>
@@ -96,7 +95,7 @@ export function Navbar() {
               {links.map((link) => (
                 <Link key={link.href} href={link.href}>
                   <a
-                    className="text-2xl font-serif font-medium"
+                    className="text-2xl font-medium"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.label}
@@ -108,7 +107,7 @@ export function Navbar() {
                 onClick={toggleTheme}
                 className="mt-4"
               >
-                {theme === 'light' ? "Dark Mode" : "Light Mode"}
+                {theme === 'light' ? "מצב כהה" : "מצב בהיר"}
               </Button>
             </motion.div>
           )}
