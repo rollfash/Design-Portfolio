@@ -12,8 +12,8 @@ export function Portfolio() {
 
   const FILTERS = [
     { id: "All", label: t("filter.all"), originalId: "All" },
-    { id: "מגורים", label: t("filter.residential"), originalId: "מגורים" },
-    { id: "מסחרי", label: t("filter.commercial"), originalId: "מסחרי" },
+    { id: "תערוכות", label: t("filter.exhibitions"), originalId: "תערוכות" },
+    { id: "חלל חוויה", label: t("filter.experience"), originalId: "חלל חוויה" },
     { id: "עיצוב סט", label: t("filter.set_design"), originalId: "עיצוב סט" }
   ];
 

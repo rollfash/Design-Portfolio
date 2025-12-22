@@ -10,8 +10,8 @@ export function Services() {
 
   const services = [
     {
-      title: t("service.residential.title"),
-      description: t("service.residential.desc"),
+      title: t("service.exhibitions.title"),
+      description: t("service.exhibitions.desc"),
       features: [t("feature.space_planning"), t("feature.materials"), t("feature.custom_furniture"), t("feature.project_mgmt")]
     },
     {
@@ -20,8 +20,8 @@ export function Services() {
       features: [t("feature.concept"), t("feature.3d"), t("feature.props"), t("feature.set_styling")]
     },
     {
-      title: t("service.commercial.title"),
-      description: t("service.commercial.desc"),
+      title: t("service.experience.title"),
+      description: t("service.experience.desc"),
       features: [t("feature.brand"), t("feature.flow"), t("feature.lighting"), t("feature.permits")]
     },
     {

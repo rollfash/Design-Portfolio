@@ -157,13 +157,10 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
                 <div className={cn("w-full h-full relative group bg-card overflow-hidden transition-all duration-700", layoutStyle.card)}>
                    <ProjectCard
                      {...localizedProject}
-                     className="w-full h-full [&>div]:h-full [&>div>img]:scale-100 [&>div>img]:group-hover:scale-105 [&>div]:mb-0 [&_h3]:text-white [&_p]:text-white/80 [&_.bg-black\/20]:opacity-30 group-hover:[&_.bg-black\/20]:opacity-60"
+                     className="w-full h-full [&>div]:h-full [&>div>img]:scale-100 [&>div>img]:group-hover:scale-105"
                    />
                    
-                   {/* Custom Label/Caption outside the card for collage feel */}
-                   <div className={cn("absolute hidden md:block text-primary/80 pointer-events-none whitespace-nowrap", layoutStyle.label)}>
-                      {localizedProject.category} <span className="mx-2 opacity-50">/</span> {localizedProject.year}
-                   </div>
+                   {/* Custom Label/Caption outside the card removed, now integrated in card overlay */}
                 </div>
               </ParallaxItem>
             );

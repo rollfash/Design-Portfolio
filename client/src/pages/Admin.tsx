@@ -223,8 +223,8 @@ export function Admin() {
                             <SelectValue placeholder="בחר קטגוריה" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="מגורים">מגורים</SelectItem>
-                            <SelectItem value="מסחרי">מסחרי</SelectItem>
+                            <SelectItem value="תערוכות">תערוכות</SelectItem>
+                            <SelectItem value="חלל חוויה">חלל חוויה</SelectItem>
                             <SelectItem value="עיצוב סט">עיצוב סט</SelectItem>
                             <SelectItem value="סטיילינג">סטיילינג</SelectItem>
                           </SelectContent>
