@@ -43,7 +43,7 @@ export function Navbar() {
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/">
           <a className="text-2xl font-bold tracking-tight z-50 relative">
-            גל שינהורן
+            Gal Shinhorn
           </a>
         </Link>
 
