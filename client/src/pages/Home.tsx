@@ -43,8 +43,8 @@ export function Home() {
 
   return (
     <Layout>
-      {/* Hero Section Wrapper - Tall container for scroll space */}
-      <section ref={heroWrapperRef} className="relative h-[300vh]">
+      {/* Hero Section Wrapper - Calculated height for scroll animation */}
+      <section ref={heroWrapperRef} className="relative" style={{ height: '200vh' }}>
         
         {/* Sticky Hero Content */}
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col items-center justify-center">
@@ -59,7 +59,7 @@ export function Home() {
             {/* Background Typography - Parallax Layer (hidden on mobile for accessibility) */}
             <motion.div 
               style={{ y: bgTextY }}
-              className="absolute inset-0 z-0 hidden md:flex flex-col items-center justify-center pointer-events-none select-none opacity-[0.04] overflow-hidden"
+              className="absolute inset-0 z-[1] hidden md:flex flex-col items-center justify-center pointer-events-none select-none opacity-[0.04] overflow-hidden"
             >
                <div className="font-bold text-[15vw] leading-none whitespace-nowrap text-foreground/50">
                  {language === 'he' ? "חללי חוויה" : "EXPERIENCE SPACES"}
@@ -70,10 +70,10 @@ export function Home() {
             </motion.div>
 
             {/* Signature Overlay - Draws on Scroll (hidden on mobile) */}
-            <div className="absolute inset-0 z-0 hidden md:flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 z-[5] hidden md:flex items-center justify-center pointer-events-none">
                <Signature 
                  progress={signatureProgress} 
-                 className="w-[45vw] max-w-[500px] text-primary opacity-60 mix-blend-multiply dark:mix-blend-screen drop-shadow-sm" 
+                 className="w-[90vw] max-w-[900px]" 
                />
             </div>
 
@@ -154,9 +154,9 @@ export function Home() {
       <HorizontalGallery projects={featuredProjects} />
 
       {/* Services Preview */}
-      <section className="py-24 bg-secondary/30 border-t border-border">
+      <section className="py-16 bg-secondary/30 border-t border-border">
         <div className="container px-6 max-w-[1920px] flex flex-col items-center text-center mx-auto">
-           <div className="max-w-3xl mb-16">
+           <div className="max-w-3xl mb-12">
              <h2 className="text-3xl md:text-4xl font-bold mb-6">{t("home.services.title")}</h2>
              <p className="text-muted-foreground text-lg leading-relaxed mb-8">
                {t("home.services.subtitle")}
