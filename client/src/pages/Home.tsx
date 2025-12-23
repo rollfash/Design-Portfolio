@@ -2,15 +2,30 @@ import { Layout } from "@/components/layout/Layout";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { HorizontalGallery } from "@/components/ui/HorizontalGallery";
 import { Button } from "@/components/ui/button";
+import { Signature } from "@/components/ui/Signature";
 import { ArrowLeft, ArrowRight } from "lucide-react"; 
 import { Link } from "wouter";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
+import { useRef } from "react";
 
 export function Home() {
   const { projects } = useProjects();
   const { t, language, direction } = useLanguage();
+  const heroRef = useRef<HTMLElement>(null);
+  
+  // Scroll progress for hero section
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  // Parallax for background text
+  const bgTextY = useTransform(smoothProgress, [0, 1], ["0%", "20%"]);
+  
   // Take featured projects
   const featuredProjects = projects.slice(0, 6); // Take up to 6 for the horizontal scroll
   const ArrowIcon = direction === 'rtl' ? ArrowLeft : ArrowRight;
@@ -18,8 +33,29 @@ export function Home() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative min-h-[95vh] flex flex-col items-center justify-center pt-20 pb-20 overflow-hidden">
+      <section ref={heroRef} className="relative min-h-[120vh] flex flex-col items-center justify-center pt-20 pb-40 overflow-hidden">
         
+        {/* Background Typography - Parallax Layer */}
+        <motion.div 
+          style={{ y: bgTextY }}
+          className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-[0.03] overflow-hidden"
+        >
+           <div className="font-bold text-[15vw] leading-none whitespace-nowrap text-foreground/50">
+             {language === 'he' ? "חללי חוויה" : "EXPERIENCE SPACES"}
+           </div>
+           <div className="font-bold text-[15vw] leading-none whitespace-nowrap text-foreground/50 ml-[20vw]">
+             {language === 'he' ? "תערוכות" : "EXHIBITIONS"}
+           </div>
+        </motion.div>
+
+        {/* Signature Overlay - Draws on Scroll */}
+        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+           <Signature 
+             progress={smoothProgress} 
+             className="w-[80vw] max-w-[600px] text-primary opacity-80 mix-blend-multiply dark:mix-blend-screen" 
+           />
+        </div>
+
         <div className="container px-6 max-w-[1920px] z-10 relative flex flex-col items-center mx-auto">
           
           <motion.div 
