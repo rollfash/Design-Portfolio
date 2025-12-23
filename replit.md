@@ -21,7 +21,7 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with Express
 - **API Pattern**: RESTful endpoints under `/api/*`
-- **Database ORM**: Drizzle ORM with PostgreSQL
+- **Data Storage**: File-based storage (JSON) in `server/projects.json` (workaround for PostgreSQL DNS issues)
 - **File Uploads**: Presigned URL flow using Google Cloud Storage via Replit's object storage integration
 
 ### Data Models
@@ -35,15 +35,18 @@ Preferred communication style: Simple, everyday language.
 
 2. **Presigned URL Uploads**: Files upload directly to cloud storage via presigned URLs, avoiding server memory constraints. The flow is: request URL → upload to storage → store path reference.
 
-3. **Shared Schema**: Database schema lives in `/shared/schema.ts` allowing type sharing between frontend and backend via Drizzle-Zod integration.
+3. **File-Based Storage**: Due to persistent PostgreSQL DNS errors ("getaddrinfo EAI_AGAIN helium"), the application uses file-based storage via `FileStorage` class in `server/file-storage.ts`. Data is stored in `server/projects.json` with atomic writes (temp file + rename), cache invalidation, and concurrent write protection.
 
-4. **Server-Side Rendering Not Used**: This is a client-side React SPA with Express serving static files in production and Vite dev server in development.
+4. **Shared Schema**: Database schema lives in `/shared/schema.ts` allowing type sharing between frontend and backend via Drizzle-Zod integration.
+
+5. **Server-Side Rendering Not Used**: This is a client-side React SPA with Express serving static files in production and Vite dev server in development.
 
 ## External Dependencies
 
-### Database
-- PostgreSQL (required via `DATABASE_URL` environment variable)
-- Drizzle Kit for schema migrations (`npm run db:push`)
+### Data Storage
+- **File-based storage**: Projects and contact submissions are stored in `server/projects.json`
+- **PostgreSQL (disabled)**: Originally used Drizzle ORM with PostgreSQL, but switched to file-based storage due to persistent DNS errors with Neon database hostname resolution
+- Note: The Drizzle schema in `shared/schema.ts` is maintained for type definitions but not actively used for persistence
 
 ### Cloud Services
 - **Google Cloud Storage**: Object storage for file uploads, accessed via Replit sidecar endpoint at `127.0.0.1:1106`
@@ -55,5 +58,5 @@ Preferred communication style: Simple, everyday language.
 - **shadcn/ui** (Radix primitives): Comprehensive UI component library
 
 ### Environment Variables Required
-- `DATABASE_URL`: PostgreSQL connection string
 - `PUBLIC_OBJECT_SEARCH_PATHS`: Optional paths for public object storage access
+- `DATABASE_URL`: (Deprecated) PostgreSQL connection string - no longer used due to DNS errors
