@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useProjects } from "@/lib/project-context";
+import { useProjects, type Project } from "@/lib/project-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,7 +8,6 @@ import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Plus, Edit2, Save, X, Upload } from "lucide-react";
-import { Project } from "@/data/projects";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export function Admin() {
@@ -93,14 +92,20 @@ export function Admin() {
     setEditingProject({
       id: `new-project-${Date.now()}`,
       title: "",
-      category: "מגורים",
+      titleEn: null,
+      category: "תערוכות",
+      categoryEn: null,
       image: "",
       year: new Date().getFullYear().toString(),
-      location: "",
-      role: "",
-      description: "",
-      services: [],
-      gallery: []
+      location: null,
+      locationEn: null,
+      role: null,
+      roleEn: null,
+      description: null,
+      descriptionEn: null,
+      services: null,
+      servicesEn: null,
+      gallery: null,
     });
     setIsAddingNew(true);
   };

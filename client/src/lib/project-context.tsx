@@ -1,34 +1,98 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { projects as initialProjects, Project } from '@/data/projects';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Project as DBProject } from '@shared/schema';
+
+// Frontend Project interface extends DB Project (keeping compatibility)
+export interface Project extends Omit<DBProject, 'createdAt'> {
+  createdAt?: Date | string;
+}
 
 interface ProjectContextType {
   projects: Project[];
-  addProject: (project: Project) => void;
-  updateProject: (id: string, updatedProject: Partial<Project>) => void;
-  deleteProject: (id: string) => void;
+  isLoading: boolean;
+  addProject: (project: Omit<Project, 'id' | 'createdAt'>) => Promise<void>;
+  updateProject: (id: string, updatedProject: Partial<Omit<Project, 'id' | 'createdAt'>>) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
-  const [projects, setProjects] = useState<Project[]>(initialProjects);
+  const queryClient = useQueryClient();
 
-  const addProject = (project: Project) => {
-    setProjects((prev) => [...prev, project]);
+  const { data: projects = [], isLoading } = useQuery({
+    queryKey: ['projects'],
+    queryFn: async () => {
+      const response = await fetch('/api/projects');
+      if (!response.ok) {
+        throw new Error('Failed to fetch projects');
+      }
+      return response.json() as Promise<Project[]>;
+    },
+  });
+
+  const addMutation = useMutation({
+    mutationFn: async (project: Omit<Project, 'id' | 'createdAt'>) => {
+      const response = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(project),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create project');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<Omit<Project, 'id' | 'createdAt'>> }) => {
+      const response = await fetch(`/api/projects/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update project');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/projects/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete project');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
+  });
+
+  const addProject = async (project: Omit<Project, 'id' | 'createdAt'>) => {
+    await addMutation.mutateAsync(project);
   };
 
-  const updateProject = (id: string, updatedProject: Partial<Project>) => {
-    setProjects((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...updatedProject } : p))
-    );
+  const updateProject = async (id: string, updatedProject: Partial<Omit<Project, 'id' | 'createdAt'>>) => {
+    await updateMutation.mutateAsync({ id, data: updatedProject });
   };
 
-  const deleteProject = (id: string) => {
-    setProjects((prev) => prev.filter((p) => p.id !== id));
+  const deleteProject = async (id: string) => {
+    await deleteMutation.mutateAsync(id);
   };
 
   return (
-    <ProjectContext.Provider value={{ projects, addProject, updateProject, deleteProject }}>
+    <ProjectContext.Provider value={{ projects, isLoading, addProject, updateProject, deleteProject }}>
       {children}
     </ProjectContext.Provider>
   );

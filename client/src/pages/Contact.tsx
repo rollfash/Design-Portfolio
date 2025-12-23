@@ -37,24 +37,30 @@ export function Contact() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const subject = `New Contact Form Submission: ${values.type}`;
-    const body = `Name: ${values.name}
-Email: ${values.email}
-Project Type: ${values.type}
-Budget: ${values.budget || "Not specified"}
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
 
-Message:
-${values.message}`;
+      if (!response.ok) {
+        throw new Error('Failed to submit contact form');
+      }
 
-    const mailtoLink = `mailto:galart1@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoLink;
-
-    setIsSubmitted(true);
-    toast({
-      title: t("contact.form.success.title"),
-      description: t("contact.form.success.desc").replace("{name}", values.name),
-    });
+      setIsSubmitted(true);
+      toast({
+        title: t("contact.form.success.title"),
+        description: t("contact.form.success.desc").replace("{name}", values.name),
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit form. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (

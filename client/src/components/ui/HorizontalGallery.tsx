@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValue, MotionValue } from "framer-motion";
-import { Project } from "@/data/projects";
+import { type Project } from "@/lib/project-context";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { useLanguage } from "@/lib/language-context";
 import { cn } from "@/lib/utils";
