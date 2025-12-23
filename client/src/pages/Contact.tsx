@@ -38,14 +38,23 @@ export function Contact() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    setTimeout(() => {
-      setIsSubmitted(true);
-      toast({
-        title: t("contact.form.success.title"),
-        description: t("contact.form.success.desc").replace("{name}", values.name),
-      });
-    }, 1000);
+    const subject = `New Contact Form Submission: ${values.type}`;
+    const body = `Name: ${values.name}
+Email: ${values.email}
+Project Type: ${values.type}
+Budget: ${values.budget || "Not specified"}
+
+Message:
+${values.message}`;
+
+    const mailtoLink = `mailto:galart1@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+
+    setIsSubmitted(true);
+    toast({
+      title: t("contact.form.success.title"),
+      description: t("contact.form.success.desc").replace("{name}", values.name),
+    });
   }
 
   return (
