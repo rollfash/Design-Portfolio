@@ -65,12 +65,6 @@ export function Contact() {
                 <a href="mailto:galart1@gmail.com" className="text-muted-foreground hover:text-primary transition-colors block">galart1@gmail.com</a>
               </div>
               <div>
-                <h3 className="font-bold mb-2 text-primary">{t("contact.studio")}</h3>
-                <p className="text-muted-foreground">
-                  {t("contact.address")}
-                </p>
-              </div>
-              <div>
                  <h3 className="font-bold mb-2 text-primary">{t("contact.phone")}</h3>
                  <a href="tel:054-454-5646" dir="ltr" className="text-muted-foreground hover:text-primary transition-colors inline-block">054-454-5646</a>
               </div>
