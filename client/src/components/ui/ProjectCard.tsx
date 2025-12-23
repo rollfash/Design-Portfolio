@@ -14,7 +14,7 @@ interface ProjectCardProps {
 export function ProjectCard({ id, title, category, image, year, className }: ProjectCardProps) {
   return (
     <Link href={`/project/${id}`}>
-      <motion.a 
+      <motion.div 
         className={`block group cursor-pointer ${className}`}
         whileHover={{ y: -5 }}
         transition={{ duration: 0.3 }}
@@ -43,7 +43,7 @@ export function ProjectCard({ id, title, category, image, year, className }: Pro
           </div>
         </div>
         {/* Remove bottom text block since it's now overlay */}
-      </motion.a>
+      </motion.div>
     </Link>
   );
 }

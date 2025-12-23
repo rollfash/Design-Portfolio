@@ -28,8 +28,8 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-6 text-sm tracking-wider uppercase text-primary">{t("footer.contact")}</h4>
             <ul className="space-y-3 text-muted-foreground">
-              <li><a href="mailto:hello@galshinhorn.com" className="hover:text-primary">hello@galshinhorn.com</a></li>
-              <li>050-123-4567</li>
+              <li><a href="mailto:galart1@gmail.com" className="hover:text-primary">galart1@gmail.com</a></li>
+              <li><a href="tel:054-454-5646" dir="ltr" className="hover:text-primary block text-left w-fit">054-454-5646</a></li>
               <li>Tel Aviv, Israel</li>
             </ul>
           </div>

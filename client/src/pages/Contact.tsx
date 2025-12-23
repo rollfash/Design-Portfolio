@@ -62,7 +62,7 @@ export function Contact() {
             <div className="md:col-span-1 space-y-8 text-center md:text-start bg-secondary/30 p-8 rounded-lg h-fit">
               <div>
                 <h3 className="font-bold mb-2 text-primary">{t("contact.email")}</h3>
-                <a href="mailto:hello@galshinhorn.com" className="text-muted-foreground hover:text-primary transition-colors block">hello@galshinhorn.com</a>
+                <a href="mailto:galart1@gmail.com" className="text-muted-foreground hover:text-primary transition-colors block">galart1@gmail.com</a>
               </div>
               <div>
                 <h3 className="font-bold mb-2 text-primary">{t("contact.studio")}</h3>
@@ -72,7 +72,7 @@ export function Contact() {
               </div>
               <div>
                  <h3 className="font-bold mb-2 text-primary">{t("contact.phone")}</h3>
-                 <p className="text-muted-foreground">050-123-4567</p>
+                 <a href="tel:054-454-5646" dir="ltr" className="text-muted-foreground hover:text-primary transition-colors block w-fit mx-auto md:mx-0">054-454-5646</a>
               </div>
               
               <div className="w-full h-32 bg-background rounded border border-border flex items-center justify-center mt-8">
