@@ -1,5 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
-import { HorizontalGallery } from "@/components/ui/HorizontalGallery";
+import { PinnedCollageGallery } from "@/components/ui/PinnedCollageGallery";
 import { Button } from "@/components/ui/button";
 import { Signature } from "@/components/ui/Signature";
 import { ArrowLeft, ArrowRight } from "lucide-react"; 
@@ -108,8 +108,8 @@ export function Home() {
         </motion.div>
       </section>
 
-      {/* Horizontal Gallery Section */}
-      <HorizontalGallery projects={featuredProjects} />
+      {/* Pinned Collage Gallery Section */}
+      <PinnedCollageGallery projects={featuredProjects} />
 
       {/* Services Preview */}
       <section className="py-16 bg-secondary/30 border-t border-border">
