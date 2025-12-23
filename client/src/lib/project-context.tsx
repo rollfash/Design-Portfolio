@@ -39,7 +39,8 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify(project),
       });
       if (!response.ok) {
-        throw new Error('Failed to create project');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to create project (${response.status})`);
       }
       return response.json();
     },

@@ -51,9 +51,10 @@ export function Admin() {
         }
         setEditingProject(null);
         setIsAddingNew(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error saving project:", error);
-        toast({ title: "שגיאה", description: "שמירת הפרויקט נכשלה", variant: "destructive" });
+        const errorMessage = error?.message || "שמירת הפרויקט נכשלה";
+        toast({ title: "שגיאה", description: errorMessage, variant: "destructive" });
       }
     }
   };
