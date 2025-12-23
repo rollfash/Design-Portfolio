@@ -17,10 +17,10 @@ export function ProjectGallery({ projects }: ProjectGalleryProps) {
       <div className="container px-6 max-w-[1920px] mx-auto">
         <motion.div 
           className="text-center mb-12"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             {t("home.featured.title")}
@@ -40,10 +40,15 @@ export function ProjectGallery({ projects }: ProjectGalleryProps) {
             return (
               <motion.div
                 key={project.id}
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ 
+                  duration: 0.7, 
+                  delay: index * 0.05,
+                  ease: [0.25, 0.1, 0.25, 1]
+                }}
+                style={{ willChange: 'opacity, transform' }}
               >
                 <Link href={`/project/${project.id}`}>
                   <div 
@@ -76,10 +81,10 @@ export function ProjectGallery({ projects }: ProjectGalleryProps) {
 
         <motion.div 
           className="text-center mt-12"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
         >
           <Link href="/portfolio">
             <button className="px-8 py-3 border border-primary/30 hover:bg-primary hover:text-primary-foreground transition-all">
