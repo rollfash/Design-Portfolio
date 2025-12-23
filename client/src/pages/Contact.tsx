@@ -72,7 +72,7 @@ export function Contact() {
               </div>
               <div>
                  <h3 className="font-bold mb-2 text-primary">{t("contact.phone")}</h3>
-                 <a href="tel:054-454-5646" dir="ltr" className="text-muted-foreground hover:text-primary transition-colors block w-fit mx-auto md:mx-0">054-454-5646</a>
+                 <a href="tel:054-454-5646" dir="ltr" className="text-muted-foreground hover:text-primary transition-colors inline-block">054-454-5646</a>
               </div>
               
               <div className="w-full h-32 bg-background rounded border border-border flex items-center justify-center mt-8">
