@@ -114,4 +114,7 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+import { FileStorage } from "./file-storage";
+
+// Switch to file-based storage to avoid production database DNS issues
+export const storage = new FileStorage();
