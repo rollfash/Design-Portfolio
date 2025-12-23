@@ -10,40 +10,41 @@ interface HorizontalGalleryProps {
 }
 
 // Define varied layout styles for a collage feel
-const LAYOUT_STYLES = [
+// Storing widths as numbers for calculation (vw units)
+const LAYOUT_CONFIG = [
   // 0: Large Hero Center
   {
+    widthMd: 50, // 50vw
     container: "w-[85vw] md:w-[50vw] h-[60vh] md:h-[75vh] mt-0 z-10",
     card: "shadow-xl border-primary/20",
-    label: "top-[-3rem] left-0 text-lg md:text-xl font-bold tracking-widest",
     parallax: 0
   },
   // 1: Small Top Offset
   {
+    widthMd: 20, // 20vw
     container: "w-[50vw] md:w-[20vw] h-[30vh] md:h-[35vh] -mt-[30vh] md:-mt-[40vh] z-0 opacity-90 grayscale-[30%] hover:grayscale-0",
     card: "shadow-md border-border",
-    label: "bottom-[-2rem] right-0 text-xs md:text-sm font-medium tracking-wide",
-    parallax: 50 // Moves faster/slower
+    parallax: 50
   },
   // 2: Medium Bottom Offset
   {
+    widthMd: 25, // 25vw
     container: "w-[60vw] md:w-[25vw] h-[40vh] md:h-[45vh] mt-[25vh] md:mt-[30vh] -ml-[10vw] md:-ml-[5vw] z-20",
     card: "shadow-lg border-border",
-    label: "top-[-2rem] left-0 text-sm font-medium tracking-wide",
     parallax: -30
   },
   // 3: Tall Portrait
   {
+    widthMd: 22, // 22vw
     container: "w-[55vw] md:w-[22vw] h-[55vh] md:h-[65vh] mt-0 md:ml-[5vw] z-10",
     card: "shadow-lg border-border",
-    label: "bottom-[-2rem] left-0 text-sm font-medium tracking-wide",
     parallax: 20
   },
   // 4: Small Bottom Far
   {
+    widthMd: 18, // 18vw
     container: "w-[45vw] md:w-[18vw] h-[25vh] md:h-[30vh] mt-[40vh] z-0 opacity-80",
     card: "shadow-sm border-border",
-    label: "top-[-2rem] right-0 text-xs font-medium tracking-wide",
     parallax: -60
   }
 ];
@@ -59,17 +60,6 @@ function ParallaxItem({
   parallax: number, 
   x: MotionValue<string> 
 }) {
-  // We need to transform the string "X%" into a number to apply parallax math, 
-  // but Framer Motion's useTransform handles string interpolation well for direct mapping.
-  // For parallax relative to a parent `x` motion value that is a string percentage, it's tricky.
-  // Instead, we can apply a simple transform on the X axis *on top* of the parent's layout flow 
-  // if we were moving the camera.
-  // BUT: The parent container `motion.div` moves. To do parallax, items inside need to move *against* or *with* that movement slightly.
-  // A simpler hack for this specific "scroll drives horizontal" setup:
-  // Since we don't have a numeric scroll value easily available in the child (it's a string %), 
-  // let's just use the style classes for positioning and skip complex nested parallax 
-  // unless we pass the raw scrollYProgress.
-  
   return (
     <div className={cn("relative flex-shrink-0 transition-transform duration-700 ease-out", style)}>
       {children}
@@ -90,12 +80,25 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   // Smooth out the scroll progress
   const smoothProgress = useSpring(scrollYProgress, { damping: 40, stiffness: 200 });
 
-  // Calculate total width approximation
-  // With varying sizes, we need a rough estimate.
-  // A "screen" of collage is roughly 1 large item + surroundings ~= 80vw.
-  // Total width ~= (projects.length / 2) * 100vw ?
-  // Let's approximate: 6 items in this layout take about 3-4 screens width.
-  const scrollRange = (projects.length * 25); 
+  // Calculate total width of all items + gaps for accurate scrolling
+  // We sum the widths defined in LAYOUT_CONFIG for the current items
+  const totalItemsWidth = projects.reduce((acc, _, i) => {
+    const config = LAYOUT_CONFIG[i % LAYOUT_CONFIG.length];
+    return acc + config.widthMd;
+  }, 0);
+
+  // Add margins: mx-8 (4rem) per item. 
+  // On a 1440px screen, 4rem is approx 4.5vw. Let's estimate 5vw per gap to be safe.
+  const totalGapWidth = projects.length * 5; 
+  
+  // Add padding: pl-[10vw] + pr-[10vw] = 20vw
+  const paddingWidth = 20;
+
+  const totalContentWidth = totalItemsWidth + totalGapWidth + paddingWidth;
+  
+  // The amount we need to scroll is the overflow width (Total - Viewport)
+  // If content fits (Total < 100), we don't scroll (max(0, ...))
+  const scrollRange = Math.max(0, totalContentWidth - 100);
   
   const x = useTransform(smoothProgress, [0, 1], ["0%", isRTL ? `${scrollRange}%` : `-${scrollRange}%`]);
 
@@ -139,7 +142,7 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
           )}
         >
           {projects.map((project, i) => {
-             const layoutStyle = LAYOUT_STYLES[i % LAYOUT_STYLES.length];
+             const layoutStyle = LAYOUT_CONFIG[i % LAYOUT_CONFIG.length];
              const localizedProject = {
                 ...project,
                 title: language === 'en' && project.titleEn ? project.titleEn : project.title,
@@ -156,10 +159,9 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
                 <div className={cn("w-full h-full relative group bg-card overflow-hidden transition-all duration-700", layoutStyle.card)}>
                    <ProjectCard
                      {...localizedProject}
-                     className="w-full h-full [&>div]:h-full [&>div>img]:scale-100 [&>div>img]:group-hover:scale-105"
+                     // Fix "square after picture" issue by removing mb-4 and aspect ratio constraints from inner div
+                     className="w-full h-full [&>div]:h-full [&>div]:mb-0 [&>div]:aspect-auto [&>div>img]:scale-100 [&>div>img]:group-hover:scale-105"
                    />
-                   
-                   {/* Custom Label/Caption outside the card removed, now integrated in card overlay */}
                 </div>
               </ParallaxItem>
             );
