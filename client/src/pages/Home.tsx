@@ -1,13 +1,19 @@
 import { Layout } from "@/components/layout/Layout";
+import { ProjectGallery } from "@/components/ui/ProjectGallery";
 import { Button } from "@/components/ui/button";
 import { Signature } from "@/components/ui/Signature";
 import { ArrowLeft, ArrowRight } from "lucide-react"; 
 import { Link } from "wouter";
 import { motion } from "framer-motion";
+import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
+import { getMostRecentProjects } from "@/lib/project-utils";
+import { useMemo } from "react";
 
 export function Home() {
+  const { projects } = useProjects();
   const { t, language, direction } = useLanguage();
+  const featuredProjects = useMemo(() => getMostRecentProjects(projects, 6), [projects]);
   const ArrowIcon = direction === 'rtl' ? ArrowLeft : ArrowRight;
 
   return (
@@ -99,6 +105,9 @@ export function Home() {
           {t("home.scroll")}
         </motion.div>
       </section>
+
+      {/* Project Gallery */}
+      <ProjectGallery projects={featuredProjects} />
 
       {/* Services Preview */}
       <section className="py-16 bg-secondary/30 border-t border-border">
