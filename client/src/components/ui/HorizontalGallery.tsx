@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValue, MotionValue } from "framer-motion";
 import { Project } from "@/data/projects";
 import { ProjectCard } from "@/components/ui/ProjectCard";
@@ -69,6 +69,9 @@ function ParallaxItem({
 
 export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   const targetRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [scrollRange, setScrollRange] = useState(0);
+
   const { scrollYProgress } = useScroll({
     target: targetRef,
     offset: ["start start", "end end"] 
@@ -80,27 +83,41 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   // Smooth out the scroll progress
   const smoothProgress = useSpring(scrollYProgress, { damping: 40, stiffness: 200 });
 
-  // Calculate total width of all items + gaps for accurate scrolling
-  // We sum the widths defined in LAYOUT_CONFIG for the current items
-  const totalItemsWidth = projects.reduce((acc, _, i) => {
-    const config = LAYOUT_CONFIG[i % LAYOUT_CONFIG.length];
-    return acc + config.widthMd;
-  }, 0);
+  // Measure actual content width to prevent overshoot
+  useEffect(() => {
+    // Small delay to ensure layout is settled
+    const timer = setTimeout(() => {
+      if (scrollContainerRef.current) {
+        const scrollWidth = scrollContainerRef.current.scrollWidth;
+        const clientWidth = scrollContainerRef.current.clientWidth;
+        // The max scroll distance is total width - visible width
+        const maxScroll = Math.max(0, scrollWidth - clientWidth);
+        setScrollRange(maxScroll);
+      }
+    }, 100);
 
-  // Add margins: mx-8 (4rem) per item. 
-  // On a 1440px screen, 4rem is approx 4.5vw. Let's estimate 5vw per gap to be safe.
-  const totalGapWidth = projects.length * 5; 
-  
-  // Add padding: pl-[10vw] + pr-[10vw] = 20vw
-  const paddingWidth = 20;
+    const handleResize = () => {
+      if (scrollContainerRef.current) {
+         const scrollWidth = scrollContainerRef.current.scrollWidth;
+         const clientWidth = scrollContainerRef.current.clientWidth;
+         setScrollRange(Math.max(0, scrollWidth - clientWidth));
+      }
+    };
 
-  const totalContentWidth = totalItemsWidth + totalGapWidth + paddingWidth;
-  
-  // The amount we need to scroll is the overflow width (Total - Viewport)
-  // If content fits (Total < 100), we don't scroll (max(0, ...))
-  const scrollRange = Math.max(0, totalContentWidth - 100);
-  
-  const x = useTransform(smoothProgress, [0, 1], ["0%", isRTL ? `${scrollRange}%` : `-${scrollRange}%`]);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
+  }, [projects]);
+
+  // Transform raw pixels to percentage of scroll width for RTL support?
+  // Actually, we can just translate by pixels directly
+  const x = useTransform(
+    smoothProgress, 
+    [0, 1], 
+    ["0px", isRTL ? `${scrollRange}px` : `-${scrollRange}px`]
+  );
 
   return (
     <section ref={targetRef} className="relative h-[400vh]">
@@ -134,9 +151,13 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
         </div>
 
         <motion.div 
+          ref={scrollContainerRef}
           style={{ x }} 
           className={cn(
-            "flex items-center pl-[10vw] pr-[10vw] h-full",
+            "flex items-center pl-[10vw] h-full w-fit",
+            // Remove right padding to avoid empty space after last item
+            // The container will grow exactly to fit content
+            
             // Mobile: Disable transform, use native scroll
             "max-md:!transform-none max-md:overflow-x-auto max-md:h-auto max-md:block max-md:whitespace-nowrap max-md:w-full max-md:px-6 max-md:py-24 max-md:absolute max-md:inset-0"
           )}
@@ -152,7 +173,7 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
             return (
               <ParallaxItem 
                 key={project.id} 
-                style={cn(layoutStyle.container, "mx-4 md:mx-8")} // Add horizontal spacing between items
+                style={cn(layoutStyle.container, "mx-4 md:mx-8 last:mr-[10vw]")} // Add margin to last item only
                 parallax={layoutStyle.parallax}
                 x={x}
               >
