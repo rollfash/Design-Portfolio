@@ -35,18 +35,26 @@ export function Admin() {
     }
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingProject) {
-      if (isAddingNew) {
-        addProject(editingProject);
-        toast({ title: "פרויקט נוסף", description: "הפרויקט החדש נוסף בהצלחה" });
-      } else {
-        updateProject(editingProject.id, editingProject);
-        toast({ title: "פרויקט עודכן", description: "השינויים נשמרו בהצלחה" });
+      try {
+        if (isAddingNew) {
+          // Remove id and createdAt for new projects - server generates these
+          const { id, createdAt, ...projectData } = editingProject;
+          await addProject(projectData);
+          toast({ title: "פרויקט נוסף", description: "הפרויקט החדש נוסף בהצלחה" });
+        } else {
+          const { id, createdAt, ...projectData } = editingProject;
+          await updateProject(editingProject.id, projectData);
+          toast({ title: "פרויקט עודכן", description: "השינויים נשמרו בהצלחה" });
+        }
+        setEditingProject(null);
+        setIsAddingNew(false);
+      } catch (error) {
+        console.error("Error saving project:", error);
+        toast({ title: "שגיאה", description: "שמירת הפרויקט נכשלה", variant: "destructive" });
       }
-      setEditingProject(null);
-      setIsAddingNew(false);
     }
   };
 
@@ -55,15 +63,24 @@ export function Admin() {
     if (file && editingProject) {
       setIsUploadingMain(true);
       try {
+        console.log("Uploading main image:", file.name, file.size, file.type);
         const response = await uploadFile(file);
+        console.log("Upload response:", response);
         if (response) {
           setEditingProject({ ...editingProject, image: response.objectPath });
           toast({ title: "תמונה הועלתה", description: "התמונה הראשית הועלתה בהצלחה" });
+        } else {
+          toast({ title: "שגיאה", description: "העלאת התמונה נכשלה - אנא נסה שוב", variant: "destructive" });
         }
       } catch (error) {
+        console.error("Upload error:", error);
         toast({ title: "שגיאה", description: "העלאת התמונה נכשלה", variant: "destructive" });
       } finally {
         setIsUploadingMain(false);
+        // Reset file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
       }
     }
   };
@@ -72,10 +89,14 @@ export function Admin() {
     const files = e.target.files;
     if (files && editingProject) {
       setIsUploadingGallery(true);
+      let uploadedCount = 0;
       try {
         for (const file of Array.from(files)) {
+          console.log("Uploading gallery image:", file.name, file.size, file.type);
           const response = await uploadFile(file);
+          console.log("Gallery upload response:", response);
           if (response) {
+            uploadedCount++;
             setEditingProject(prev => {
               if (!prev) return null;
               const newGallery = [...(prev.gallery || []), response.objectPath];
@@ -83,11 +104,20 @@ export function Admin() {
             });
           }
         }
-        toast({ title: "תמונות הועלו", description: "התמונות הועלו בהצלחה לגלריה" });
+        if (uploadedCount > 0) {
+          toast({ title: "תמונות הועלו", description: `${uploadedCount} תמונות הועלו בהצלחה לגלריה` });
+        } else {
+          toast({ title: "שגיאה", description: "העלאת התמונות נכשלה - אנא נסה שוב", variant: "destructive" });
+        }
       } catch (error) {
+        console.error("Gallery upload error:", error);
         toast({ title: "שגיאה", description: "העלאת התמונות נכשלה", variant: "destructive" });
       } finally {
         setIsUploadingGallery(false);
+        // Reset file input
+        if (galleryInputRef.current) {
+          galleryInputRef.current.value = "";
+        }
       }
     }
   };
