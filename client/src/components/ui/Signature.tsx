@@ -26,9 +26,9 @@ export function Signature({ progress, className }: SignatureProps) {
         className="w-full h-full"
       >
         <motion.path
-          d="M40 100 C 50 90, 60 130, 70 110 C 80 90, 90 70, 100 90 C 110 110, 100 130, 110 120 C 120 110, 130 90, 140 100 S 160 120, 170 110 C 180 100, 190 90, 200 100 C 210 110, 220 120, 230 110 S 250 90, 260 100 C 270 110, 280 120, 290 110 S 310 90, 320 100 C 330 110, 340 120, 350 110"
+          d="M160 240 C 170 200, 240 80, 260 60 C 255 90, 220 160, 210 180 C 230 160, 280 140, 300 130"
           stroke="currentColor"
-          strokeWidth="2.5"
+          strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
           className="text-primary drop-shadow-sm opacity-90"
