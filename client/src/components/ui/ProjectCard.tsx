@@ -12,6 +12,11 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ id, title, category, image, year, className }: ProjectCardProps) {
+  // Default placeholder image for empty/missing images
+  const imageSrc = image && image.trim() !== '' 
+    ? image 
+    : 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500"%3E%3Crect fill="%23374151" width="400" height="500"/%3E%3Ctext fill="%239CA3AF" font-family="system-ui" font-size="16" x="50%25" y="50%25" text-anchor="middle"%3ENo Image%3C/text%3E%3C/svg%3E';
+
   return (
     <Link href={`/project/${id}`}>
       <motion.div 
@@ -21,7 +26,7 @@ export function ProjectCard({ id, title, category, image, year, className }: Pro
       >
         <div className="relative overflow-hidden aspect-[4/5] bg-muted mb-4 group-hover:border-transparent">
           <motion.img 
-            src={image} 
+            src={imageSrc} 
             alt={title}
             className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
           />

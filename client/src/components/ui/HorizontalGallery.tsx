@@ -144,7 +144,7 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   );
 
   return (
-    <section ref={targetRef} className="relative h-auto md:h-[400vh]">
+    <section ref={targetRef} className="relative h-auto md:h-[400vh]" style={{ position: 'relative' }}>
       {/* Enhanced Depth Overlay for Collage Section */}
       <div className="absolute inset-0 z-0 pointer-events-none hidden md:block" 
            style={{ 
