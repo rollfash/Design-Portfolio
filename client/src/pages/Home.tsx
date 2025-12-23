@@ -110,7 +110,11 @@ export function Home() {
                   >
                      {/* Dynamic Language Content - Centered Single Block */}
                      <div className="text-muted-foreground text-xs md:text-sm leading-relaxed">
-                        <p>{t("hero." + language + ".p1")} {language === 'he' ? "חללים, במות וסטים משפיעים" : "Impactful spaces, stages and sets."}</p>
+                        <p>
+                          {language === 'he' 
+                            ? "סטודיו גל שינהורן הוא משרד עיצוב המתמחה בחללים ייצוגיים, חללי חוויה ותערוכות. אנחנו פועלים כבר למעלה מ-20 שנה ועזרנו ללקוחות רבים ליצור חללים, במות וסטים עוצמתיים ומשפיעים."
+                            : "Gal Shinhorn Studio is a design firm that specializes in representative spaces, experience spaces, and exhibitions. We've been in business for over 20 years and have helped many clients create powerful and impactful spaces, stages and sets."}
+                        </p>
                      </div>
                   </motion.div>
 
