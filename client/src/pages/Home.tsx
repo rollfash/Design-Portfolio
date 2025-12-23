@@ -69,10 +69,10 @@ export function Home() {
             </motion.div>
 
             {/* Signature Overlay - Draws on Scroll */}
-            <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
                <Signature 
                  progress={signatureProgress} 
-                 className="w-[45vw] max-w-[500px] text-primary opacity-90 mix-blend-multiply dark:mix-blend-screen drop-shadow-sm" 
+                 className="w-[45vw] max-w-[500px] text-primary opacity-60 mix-blend-multiply dark:mix-blend-screen drop-shadow-sm" 
                />
             </div>
 
