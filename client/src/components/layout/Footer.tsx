@@ -1,6 +1,9 @@
-import { Instagram, Linkedin } from "lucide-react";
+import { Instagram, Linkedin, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/language-context";
+
+const WHATSAPP_NUMBER = "972544545646";
+const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 export function Footer() {
   const { t } = useLanguage();
@@ -37,6 +40,9 @@ export function Footer() {
           <div className="flex flex-col items-center">
              <h4 className="font-semibold mb-6 text-sm tracking-wider uppercase text-primary">{t("footer.social")}</h4>
              <div className="flex gap-4">
+              <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="p-3 bg-background rounded-full hover:bg-[#25D366] hover:text-white transition-all duration-300 shadow-sm" data-testid="link-whatsapp">
+                <MessageCircle className="h-5 w-5" />
+              </a>
               <a href="#" className="p-3 bg-background rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm">
                 <Instagram className="h-5 w-5" />
               </a>

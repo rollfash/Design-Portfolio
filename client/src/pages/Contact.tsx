@@ -12,6 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/language-context";
+import { MessageCircle } from "lucide-react";
+
+const WHATSAPP_LINK = "https://wa.me/972544545646";
 
 const formSchema = z.object({
   name: z.string().min(2, "Min 2 chars"),
@@ -82,6 +85,19 @@ export function Contact() {
               <div>
                  <h3 className="font-bold mb-2 text-primary">{t("contact.phone")}</h3>
                  <a href="tel:054-454-5646" dir="ltr" className="text-muted-foreground hover:text-primary transition-colors inline-block">054-454-5646</a>
+              </div>
+              <div>
+                 <h3 className="font-bold mb-2 text-primary">WhatsApp</h3>
+                 <a 
+                   href={WHATSAPP_LINK} 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   className="inline-flex items-center gap-2 px-4 py-2 bg-[#25D366] text-white rounded-full hover:bg-[#128C7E] transition-colors"
+                   data-testid="link-whatsapp-contact"
+                 >
+                   <MessageCircle className="h-5 w-5" />
+                   <span>{t("contact.whatsapp") || "Message on WhatsApp"}</span>
+                 </a>
               </div>
               
               <div className="w-full h-32 bg-background rounded border border-border flex items-center justify-center mt-8">
