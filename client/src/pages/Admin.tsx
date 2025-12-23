@@ -7,8 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Plus, Edit2, Save, X, Upload } from "lucide-react";
+import { Trash2, Plus, Edit2, Save, X, Upload, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useUpload } from "@/hooks/use-upload";
 
 export function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -17,8 +18,11 @@ export function Admin() {
   const { toast } = useToast();
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [isUploadingMain, setIsUploadingMain] = useState(false);
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const { uploadFile } = useUpload();
 
   // Simple mock login
   const handleLogin = (e: React.FormEvent) => {
@@ -46,32 +50,45 @@ export function Admin() {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && editingProject) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setEditingProject({ ...editingProject, image: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      setIsUploadingMain(true);
+      try {
+        const response = await uploadFile(file);
+        if (response) {
+          setEditingProject({ ...editingProject, image: response.objectPath });
+          toast({ title: "תמונה הועלתה", description: "התמונה הראשית הועלתה בהצלחה" });
+        }
+      } catch (error) {
+        toast({ title: "שגיאה", description: "העלאת התמונה נכשלה", variant: "destructive" });
+      } finally {
+        setIsUploadingMain(false);
+      }
     }
   };
 
-  const handleGalleryUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && editingProject) {
-       Array.from(files).forEach(file => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-             // We need to use functional update to ensure we don't overwrite concurrent reads
-             setEditingProject(prev => {
-                if (!prev) return null;
-                const newGallery = [...(prev.gallery || []), reader.result as string];
-                return { ...prev, gallery: newGallery };
-             });
-          };
-          reader.readAsDataURL(file);
-       });
+      setIsUploadingGallery(true);
+      try {
+        for (const file of Array.from(files)) {
+          const response = await uploadFile(file);
+          if (response) {
+            setEditingProject(prev => {
+              if (!prev) return null;
+              const newGallery = [...(prev.gallery || []), response.objectPath];
+              return { ...prev, gallery: newGallery };
+            });
+          }
+        }
+        toast({ title: "תמונות הועלו", description: "התמונות הועלו בהצלחה לגלריה" });
+      } catch (error) {
+        toast({ title: "שגיאה", description: "העלאת התמונות נכשלה", variant: "destructive" });
+      } finally {
+        setIsUploadingGallery(false);
+      }
     }
   };
 
@@ -283,15 +300,20 @@ export function Admin() {
                                 onChange={handleImageUpload}
                                 className="hidden"
                                 ref={fileInputRef}
+                                disabled={isUploadingMain}
                               />
                               <Button 
                                 type="button" 
                                 variant="outline" 
                                 onClick={() => fileInputRef.current?.click()}
                                 className="w-full border-dashed border-2 h-20 hover:border-primary hover:bg-primary/5"
+                                disabled={isUploadingMain}
                               >
-                                <Upload className="mr-2 h-4 w-4" /> 
-                                {editingProject.image ? "החלף תמונה" : "בחר תמונה מהמחשב"}
+                                {isUploadingMain ? (
+                                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> מעלה...</>
+                                ) : (
+                                  <><Upload className="mr-2 h-4 w-4" /> {editingProject.image ? "החלף תמונה" : "בחר תמונה מהמחשב"}</>
+                                )}
                               </Button>
                             </div>
                          </div>
@@ -333,15 +355,20 @@ export function Admin() {
                                 onChange={handleGalleryUpload}
                                 className="hidden"
                                 ref={galleryInputRef}
+                                disabled={isUploadingGallery}
                               />
                               <Button 
                                 type="button" 
                                 variant="outline" 
                                 onClick={() => galleryInputRef.current?.click()}
                                 className="w-full h-full border-dashed border-2 flex flex-col gap-2 hover:border-primary hover:bg-primary/5"
+                                disabled={isUploadingGallery}
                               >
-                                <Plus className="h-6 w-6" /> 
-                                <span>הוסף מדיה</span>
+                                {isUploadingGallery ? (
+                                  <><Loader2 className="h-6 w-6 animate-spin" /><span>מעלה...</span></>
+                                ) : (
+                                  <><Plus className="h-6 w-6" /><span>הוסף מדיה</span></>
+                                )}
                               </Button>
                           </div>
                        </div>

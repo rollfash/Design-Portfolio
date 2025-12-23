@@ -2,11 +2,15 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertProjectSchema, insertContactSubmissionSchema } from "@shared/schema";
+import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Register object storage routes for file uploads
+  registerObjectStorageRoutes(app);
+
   // Projects API
   app.get("/api/projects", async (req, res) => {
     try {
