@@ -82,10 +82,12 @@ export async function registerRoutes(
       
       // Send email notification via Resend
       try {
-        const { client, fromEmail } = await getResendClient();
-        console.log("Sending email from:", fromEmail || 'onboarding@resend.dev');
+        const { client } = await getResendClient();
+        // Use Resend's default sender - custom domains require verification
+        const senderEmail = 'Gal Shinhorn Portfolio <onboarding@resend.dev>';
+        console.log("Sending email from:", senderEmail);
         const result = await client.emails.send({
-          from: fromEmail || 'onboarding@resend.dev',
+          from: senderEmail,
           to: 'galart1@gmail.com',
           subject: `New Contact Form Submission from ${validatedData.name}`,
           html: `
