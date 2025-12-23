@@ -7,6 +7,7 @@ interface SignatureProps {
 }
 
 // Separate component to handle hooks for each path segment
+// This fixes the "Rendered fewer/more hooks" runtime error
 function SignaturePath({ 
   d, 
   index, 
@@ -57,7 +58,8 @@ function SignaturePath({
 export function Signature({ progress, className }: SignatureProps) {
   const shouldReduceMotion = useReducedMotion();
 
-  // Placeholder paths until the real SVG is available
+  // Clean placeholder paths that simulate a signature
+  // These are safe and won't cause syntax errors
   const paths = [
     // "G"
     "M60 80 C 50 70, 50 40, 80 40 C 95 40, 100 60, 90 75 C 80 90, 60 90, 70 70",
