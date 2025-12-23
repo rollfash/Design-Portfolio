@@ -113,6 +113,7 @@ export function Admin() {
       category: "תערוכות",
       categoryEn: null,
       image: "",
+      date: null,
       year: new Date().getFullYear().toString(),
       location: null,
       locationEn: null,
@@ -253,7 +254,16 @@ export function Admin() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label>שנה</Label>
+                        <Label>תאריך הפרויקט (YYYY-MM-DD)</Label>
+                        <Input 
+                          type="date"
+                          value={editingProject.date || ''} 
+                          onChange={(e) => setEditingProject({...editingProject, date: e.target.value})}
+                          placeholder="2024-01-15"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>שנה (חלופי אם אין תאריך)</Label>
                         <Input 
                           value={editingProject.year} 
                           onChange={(e) => setEditingProject({...editingProject, year: e.target.value})}

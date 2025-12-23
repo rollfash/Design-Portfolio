@@ -1,4 +1,4 @@
-import { Project } from "@shared/schema";
+import { Project } from "@/lib/project-context";
 
 /**
  * Sort projects by date (YYYY-MM-DD format) or year, most recent first.
