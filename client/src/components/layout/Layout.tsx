@@ -1,7 +1,9 @@
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { AccessibilityMenu } from "@/components/ui/AccessibilityMenu";
 import { motion } from "framer-motion";
 import { useLocation } from "wouter";
+import { useLanguage } from "@/lib/language-context";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,11 +11,17 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
+  const { language } = useLanguage();
 
   return (
     <div className="min-h-screen text-foreground flex flex-col font-sans overflow-x-hidden max-w-[100vw]">
+      {/* Skip to content link for screen readers */}
+      <a href="#main-content" className="skip-link">
+        {language === 'he' ? 'דלג לתוכן' : 'Skip to content'}
+      </a>
+      
       <Navbar />
-      <main className="flex-grow pt-24 overflow-x-hidden">
+      <main id="main-content" className="flex-grow pt-24 overflow-x-hidden" tabIndex={-1}>
         {/* Page transition wrapper */}
         <motion.div
           key={location}
@@ -27,6 +35,9 @@ export function Layout({ children }: LayoutProps) {
         </motion.div>
       </main>
       <Footer />
+      
+      {/* Accessibility Menu */}
+      <AccessibilityMenu />
     </div>
   );
 }
