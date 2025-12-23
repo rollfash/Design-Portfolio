@@ -4,38 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Signature } from "@/components/ui/Signature";
 import { ArrowLeft, ArrowRight } from "lucide-react"; 
 import { Link } from "wouter";
-import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
 import { getMostRecentProjects } from "@/lib/project-utils";
-import { useRef, useMemo } from "react";
+import { useMemo } from "react";
 
 export function Home() {
   const { projects } = useProjects();
   const { t, language, direction } = useLanguage();
-  const heroWrapperRef = useRef<HTMLElement>(null);
-  const shouldReduceMotion = useReducedMotion();
-  
-  // Scroll progress for hero section wrapper
-  const { scrollYProgress } = useScroll({
-    target: heroWrapperRef,
-    offset: ["start start", "end end"]
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
-
-  // Map scroll to animation values
-  // Scale down from 1.1 to 1
-  const heroScale = useTransform(smoothProgress, [0, 1], [1.15, 1]);
-  // Signature progress matches scroll 0-1
-  const signatureProgress = smoothProgress;
-  // Parallax background text moves up slightly
-  const bgTextY = useTransform(smoothProgress, [0, 1], ["0%", "-15%"]);
-  // Fade out scroll indicator
-  const scrollIndicatorOpacity = useTransform(smoothProgress, [0, 0.2], [1, 0]);
-
-  // Reduced motion overrides
-  const finalScale = shouldReduceMotion ? 1 : heroScale;
   
   // Get most recent projects for horizontal scroll gallery (memoized for performance)
   const featuredProjects = useMemo(() => getMostRecentProjects(projects, 6), [projects]);
@@ -43,111 +20,92 @@ export function Home() {
 
   return (
     <Layout>
-      {/* Hero Section Wrapper - Calculated height for scroll animation */}
-      <section ref={heroWrapperRef} className="relative" style={{ height: '200vh' }}>
+      {/* Hero Section - Normal Height */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center py-20">
         
-        {/* Sticky Hero Content */}
-        <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col items-center justify-center">
-            
-            {/* NEW: Hero Background Treatment */}
-            {/* 1. Base Wash */}
-            <div className="absolute inset-0 z-0 bg-hero-wash dark:bg-hero-wash-dark opacity-80 pointer-events-none transition-colors duration-500" />
-            
-            {/* 2. Soft Gradient Overlay (Two-tone) */}
-            <div className="absolute inset-0 z-0 bg-gradient-to-tr from-[hsl(var(--brand-stone))]/5 via-transparent to-[hsl(var(--brand-teal))]/5 pointer-events-none mix-blend-overlay" />
+        {/* Hero Background Treatment */}
+        <div className="absolute inset-0 z-0 bg-hero-wash dark:bg-hero-wash-dark opacity-80 pointer-events-none transition-colors duration-500" />
+        <div className="absolute inset-0 z-0 bg-gradient-to-tr from-[hsl(var(--brand-stone))]/5 via-transparent to-[hsl(var(--brand-teal))]/5 pointer-events-none mix-blend-overlay" />
 
-            {/* Background Typography - Parallax Layer (hidden on mobile for accessibility) */}
-            <motion.div 
-              style={{ y: bgTextY }}
-              className="absolute inset-0 z-[1] hidden md:flex flex-col items-center justify-center pointer-events-none select-none opacity-[0.04] overflow-hidden"
-            >
-               <div className="font-bold text-[15vw] leading-none whitespace-nowrap text-foreground/50">
-                 {language === 'he' ? "חללי חוויה" : "EXPERIENCE SPACES"}
-               </div>
-               <div className="font-bold text-[15vw] leading-none whitespace-nowrap text-foreground/50 ml-[20vw]">
-                 {language === 'he' ? "תערוכות" : "EXHIBITIONS"}
-               </div>
-            </motion.div>
-
-            {/* Signature Overlay - Draws on Scroll (hidden on mobile) */}
-            <div className="absolute inset-0 z-[5] hidden md:flex items-center justify-center pointer-events-none">
-               <Signature 
-                 progress={signatureProgress} 
-                 className="w-[90vw] max-w-[900px]" 
-               />
-            </div>
-
-            {/* Main Hero Content - Scalable Wrapper */}
-            <motion.div 
-                style={{ scale: finalScale }}
-                className="w-full h-full flex flex-col items-center justify-center relative z-10"
-            >
-                <div className="container px-6 max-w-[1920px] relative flex flex-col items-center mx-auto">
-                  
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="mb-12 relative"
-                  >
-                    {/* NEW: Faint Color Halo behind Avatar */}
-                    <div className="absolute inset-0 -m-8 rounded-full bg-[hsl(var(--brand-stone))] blur-3xl opacity-20 dark:opacity-10 animate-pulse-slow pointer-events-none" />
-                    
-                    <div className="relative rounded-full p-[3px] bg-gradient-to-tr from-[hsl(var(--brand-stone))] via-background to-[hsl(var(--brand-olive))] shadow-xl">
-                      <img 
-                        src="/avatar.jpg" 
-                        alt={language === 'he' ? "גל שינהורן - פורטרט" : "Gal Shinhorn - Portrait"} 
-                        className="w-[110px] h-[110px] md:w-[140px] md:h-[140px] rounded-full object-cover border-4 border-background/90"
-                      />
-                    </div>
-                  </motion.div>
-
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                    className="w-full max-w-4xl mx-auto mb-20 text-center"
-                  >
-                     {/* Dynamic Language Content - Centered Single Block */}
-                     <div className="text-muted-foreground text-xs md:text-sm leading-relaxed">
-                        <p>
-                          {language === 'he' 
-                            ? "סטודיו גל שינהורן הוא משרד עיצוב המתמחה בחללים ייצוגיים, חללי חוויה ותערוכות. אנחנו פועלים כבר למעלה מ-20 שנה ועזרנו ללקוחות רבים ליצור חללים, במות וסטים עוצמתיים ומשפיעים."
-                            : "Gal Shinhorn Studio is a design firm that specializes in representative spaces, experience spaces, and exhibitions. We've been in business for over 20 years and have helped many clients create powerful and impactful spaces, stages and sets."}
-                        </p>
-                     </div>
-                  </motion.div>
-
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.4 }}
-                    className="flex flex-col sm:flex-row items-center justify-center gap-6"
-                  >
-                     <Link href="/portfolio">
-                      <Button size="lg" className="rounded-none px-10 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all min-w-[200px]">
-                        {t("home.hero.cta.portfolio")}
-                      </Button>
-                    </Link>
-                    <Link href="/contact">
-                      <Button size="lg" variant="outline" className="rounded-none px-10 py-6 text-lg border-primary/30 hover:bg-secondary hover:text-primary transition-all min-w-[200px]">
-                        {t("home.hero.cta.contact")}
-                      </Button>
-                    </Link>
-                  </motion.div>
-                </div>
-            </motion.div>
-
-            {/* Scroll indicator - Positioned absolutely at bottom */}
-            <motion.div 
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 text-primary/40 text-sm tracking-[0.2em] uppercase z-30 pointer-events-none"
-              style={{ opacity: scrollIndicatorOpacity }}
-              animate={{ y: [0, 8, 0] }}
-              transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-            >
-              {t("home.scroll")}
-            </motion.div>
+        {/* Background Typography (hidden on mobile) */}
+        <div className="absolute inset-0 z-[1] hidden md:flex flex-col items-center justify-center pointer-events-none select-none opacity-[0.04] overflow-hidden">
+          <div className="font-bold text-[15vw] leading-none whitespace-nowrap text-foreground/50">
+            {language === 'he' ? "חללי חוויה" : "EXPERIENCE SPACES"}
+          </div>
+          <div className="font-bold text-[15vw] leading-none whitespace-nowrap text-foreground/50 ml-[20vw]">
+            {language === 'he' ? "תערוכות" : "EXHIBITIONS"}
+          </div>
         </div>
+
+        {/* Signature Overlay - Auto-draws on load (hidden on mobile) */}
+        <div className="absolute inset-0 z-[5] hidden md:flex items-center justify-center pointer-events-none">
+          <Signature className="w-[90vw] max-w-[900px]" />
+        </div>
+
+        {/* Main Hero Content */}
+        <div className="w-full flex flex-col items-center justify-center relative z-10">
+          <div className="container px-6 max-w-[1920px] relative flex flex-col items-center mx-auto">
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mb-12 relative"
+            >
+              <div className="absolute inset-0 -m-8 rounded-full bg-[hsl(var(--brand-stone))] blur-3xl opacity-20 dark:opacity-10 animate-pulse-slow pointer-events-none" />
+              
+              <div className="relative rounded-full p-[3px] bg-gradient-to-tr from-[hsl(var(--brand-stone))] via-background to-[hsl(var(--brand-olive))] shadow-xl">
+                <img 
+                  src="/avatar.jpg" 
+                  alt={language === 'he' ? "גל שינהורן - פורטרט" : "Gal Shinhorn - Portrait"} 
+                  className="w-[110px] h-[110px] md:w-[140px] md:h-[140px] rounded-full object-cover border-4 border-background/90"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="w-full max-w-4xl mx-auto mb-20 text-center"
+            >
+              <div className="text-muted-foreground text-xs md:text-sm leading-relaxed">
+                <p>
+                  {language === 'he' 
+                    ? "סטודיו גל שינהורן הוא משרד עיצוב המתמחה בחללים ייצוגיים, חללי חוויה ותערוכות. אנחנו פועלים כבר למעלה מ-20 שנה ועזרנו ללקוחות רבים ליצור חללים, במות וסטים עוצמתיים ומשפיעים."
+                    : "Gal Shinhorn Studio is a design firm that specializes in representative spaces, experience spaces, and exhibitions. We've been in business for over 20 years and have helped many clients create powerful and impactful spaces, stages and sets."}
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-6"
+            >
+              <Link href="/portfolio">
+                <Button size="lg" className="rounded-none px-10 py-6 text-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all min-w-[200px]">
+                  {t("home.hero.cta.portfolio")}
+                </Button>
+              </Link>
+              <Link href="/contact">
+                <Button size="lg" variant="outline" className="rounded-none px-10 py-6 text-lg border-primary/30 hover:bg-secondary hover:text-primary transition-all min-w-[200px]">
+                  {t("home.hero.cta.contact")}
+                </Button>
+              </Link>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Scroll indicator - Positioned absolutely at bottom */}
+        <motion.div 
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-primary/40 text-sm tracking-[0.2em] uppercase z-30 pointer-events-none"
+          animate={{ y: [0, 8, 0] }}
+          transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+        >
+          {t("home.scroll")}
+        </motion.div>
       </section>
 
       {/* Horizontal Gallery Section */}
