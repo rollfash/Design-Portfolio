@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertProjectSchema, insertContactSubmissionSchema } from "@shared/schema";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
+import { getResendClient } from "./resend-client";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -78,6 +79,30 @@ export async function registerRoutes(
     try {
       const validatedData = insertContactSubmissionSchema.parse(req.body);
       const submission = await storage.createContactSubmission(validatedData);
+      
+      // Send email notification via Resend
+      try {
+        const { client, fromEmail } = await getResendClient();
+        await client.emails.send({
+          from: fromEmail || 'onboarding@resend.dev',
+          to: 'galart1@gmail.com',
+          subject: `New Contact Form Submission from ${validatedData.name}`,
+          html: `
+            <h2>New Contact Form Submission</h2>
+            <p><strong>Name:</strong> ${validatedData.name}</p>
+            <p><strong>Email:</strong> ${validatedData.email}</p>
+            <p><strong>Type:</strong> ${validatedData.type}</p>
+            ${validatedData.budget ? `<p><strong>Budget:</strong> ${validatedData.budget}</p>` : ''}
+            <p><strong>Message:</strong></p>
+            <p>${validatedData.message}</p>
+          `
+        });
+        console.log("Email notification sent to galart1@gmail.com");
+      } catch (emailError) {
+        console.error("Failed to send email notification:", emailError);
+        // Don't fail the request if email fails - submission is still saved
+      }
+      
       res.status(201).json(submission);
     } catch (error: any) {
       console.error("Error creating contact submission:", error);
