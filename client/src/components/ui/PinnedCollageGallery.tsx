@@ -1,7 +1,6 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { type Project } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
-import { cn } from "@/lib/utils";
 import { Link } from "wouter";
 
 interface PinnedCollageGalleryProps {
@@ -38,9 +37,10 @@ export function PinnedCollageGallery({ projects }: PinnedCollageGalleryProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   
-  const [overflow, setOverflow] = useState(0);
+  const [wrapperHeight, setWrapperHeight] = useState("100vh");
   const [displayProgress, setDisplayProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const overflowRef = useRef(0);
   
   const { language, direction, t } = useLanguage();
   const isRTL = direction === 'rtl';
@@ -60,28 +60,32 @@ export function PinnedCollageGallery({ projects }: PinnedCollageGalleryProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Measurement: calculate overflow and set wrapper height
-  useEffect(() => {
-    if (isMobile || !viewportRef.current || !trackRef.current || !wrapperRef.current) return;
+  // Measure and calculate dimensions
+  const measure = useCallback(() => {
+    if (isMobile || !viewportRef.current || !trackRef.current) return;
     
-    const measure = () => {
-      if (!viewportRef.current || !trackRef.current || !wrapperRef.current) return;
-      
-      const viewportWidth = viewportRef.current.clientWidth;
-      const trackWidth = trackRef.current.scrollWidth;
-      const calculatedOverflow = Math.max(0, trackWidth - viewportWidth);
-      
-      setOverflow(calculatedOverflow);
-      
-      // Set wrapper height = viewportHeight + overflow
-      const viewportHeight = window.innerHeight;
-      wrapperRef.current.style.height = `${viewportHeight + calculatedOverflow}px`;
-    };
+    const viewportWidth = viewportRef.current.clientWidth;
+    const trackWidth = trackRef.current.scrollWidth;
+    const calculatedOverflow = Math.max(0, trackWidth - viewportWidth);
+    
+    overflowRef.current = calculatedOverflow;
+    
+    // Set wrapper height = viewportHeight + overflow (creates scrollable area)
+    const viewportHeight = window.innerHeight;
+    const totalHeight = viewportHeight + calculatedOverflow;
+    setWrapperHeight(`${totalHeight}px`);
+  }, [isMobile]);
 
+  // Initial measurement and re-measure on changes
+  useEffect(() => {
+    if (isMobile) return;
+    
     measure();
     
     // Delayed measurements for image loading
-    const timers = [100, 300, 600, 1000, 1500].map(delay => setTimeout(measure, delay));
+    const timers = [100, 300, 600, 1000, 2000].map(delay => 
+      setTimeout(measure, delay)
+    );
 
     // ResizeObserver
     const observer = new ResizeObserver(measure);
@@ -90,7 +94,11 @@ export function PinnedCollageGallery({ projects }: PinnedCollageGalleryProps) {
 
     // Image load listeners
     const images = trackRef.current?.querySelectorAll('img');
-    images?.forEach(img => img.addEventListener('load', measure));
+    images?.forEach(img => {
+      if (!img.complete) {
+        img.addEventListener('load', measure);
+      }
+    });
 
     window.addEventListener('resize', measure);
 
@@ -100,53 +108,51 @@ export function PinnedCollageGallery({ projects }: PinnedCollageGalleryProps) {
       images?.forEach(img => img.removeEventListener('load', measure));
       window.removeEventListener('resize', measure);
     };
-  }, [projects, isMobile]);
+  }, [projects, isMobile, measure]);
 
-  // Scroll handler: convert vertical scroll to horizontal translation
+  // Scroll handler
   useEffect(() => {
-    if (isMobile || !wrapperRef.current || !trackRef.current || overflow <= 0) return;
+    if (isMobile) return;
 
     const handleScroll = () => {
       if (!wrapperRef.current || !trackRef.current) return;
       
-      const scrollY = window.scrollY;
-      // Use getBoundingClientRect for more reliable positioning
-      const wrapperRect = wrapperRef.current.getBoundingClientRect();
-      const wrapperTop = scrollY + wrapperRect.top;
+      const overflow = overflowRef.current;
+      if (overflow <= 0) return;
       
-      // Progress: 0 at start, 1 when all overflow is consumed
+      const scrollY = window.scrollY;
+      const wrapperTop = wrapperRef.current.offsetTop;
+      
+      // Progress: 0 at wrapper top, 1 when overflow is consumed
       const rawProgress = (scrollY - wrapperTop) / overflow;
       const clampedProgress = Math.max(0, Math.min(1, rawProgress));
       
-      // Store raw progress for display (counter/progress bar - always 0→1)
       setDisplayProgress(clampedProgress);
       
-      // Direction-aware travel for transforms: LTR goes 0→1, RTL goes 1→0
+      // Direction-aware travel for transforms
       const travel = isRTL ? (1 - clampedProgress) : clampedProgress;
       
-      // Always translate negatively based on travel
+      // Translate track
       const translateX = -travel * overflow;
       trackRef.current.style.transform = `translateX(${translateX}px)`;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial position
+    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      // Reset transform on unmount
       if (trackRef.current) {
         trackRef.current.style.transform = '';
       }
     };
-  }, [overflow, isRTL, isMobile]);
+  }, [isRTL, isMobile]);
 
   // Mobile: swipeable horizontal gallery
   if (isMobile) {
     return (
       <section className="py-12 bg-background">
         <div className="px-4">
-          {/* Progress UI */}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-sm uppercase tracking-[0.25em] text-primary font-medium mb-2">
@@ -159,9 +165,8 @@ export function PinnedCollageGallery({ projects }: PinnedCollageGalleryProps) {
             </div>
           </div>
           
-          {/* Swipeable track */}
           <div 
-            className="overflow-x-auto overflow-y-hidden -mx-4 px-4 pb-4 snap-x snap-mandatory scrollbar-hide"
+            className="overflow-x-auto overflow-y-hidden -mx-4 px-4 pb-4 scrollbar-hide"
             style={{ scrollSnapType: 'x mandatory' }}
           >
             <div className="flex gap-6" style={{ width: 'max-content' }}>
@@ -172,15 +177,14 @@ export function PinnedCollageGallery({ projects }: PinnedCollageGalleryProps) {
                 return (
                   <div 
                     key={project.id} 
-                    className="flex-shrink-0 w-[85vw] snap-start"
+                    className="flex-shrink-0 w-[85vw]"
+                    style={{ scrollSnapAlign: 'start' }}
                     data-testid={`gallery-frame-${idx}`}
                   >
-                    {/* Caption */}
                     <div className="mb-3 text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
                       {localizedTitle} • {project.year || '2024'}
                     </div>
                     
-                    {/* Image */}
                     <Link href={`/project/${project.id}`}>
                       <div className="relative aspect-[3/4] overflow-hidden bg-secondary/10 group cursor-pointer">
                         <img 
@@ -210,6 +214,7 @@ export function PinnedCollageGallery({ projects }: PinnedCollageGalleryProps) {
     <section 
       ref={wrapperRef}
       className="relative bg-background"
+      style={{ height: wrapperHeight }}
       data-testid="pinned-collage-gallery"
     >
       {/* Subtle grid background */}
@@ -249,7 +254,7 @@ export function PinnedCollageGallery({ projects }: PinnedCollageGalleryProps) {
         {/* Horizontal track with collage frames */}
         <div 
           ref={trackRef}
-          className="absolute inset-0 flex will-change-transform"
+          className="absolute top-0 left-0 h-full flex will-change-transform"
           style={{ width: 'max-content' }}
         >
           {renderProjects.map((project, idx) => {
@@ -302,9 +307,8 @@ export function PinnedCollageGallery({ projects }: PinnedCollageGalleryProps) {
                     </Link>
                   </div>
 
-                  {/* Supporting images from project gallery (loop through gallery if needed) */}
+                  {/* Supporting images from project gallery */}
                   {project.gallery && project.gallery.length > 0 && frameConfig.supporting.map((pos, i) => {
-                    // Loop through gallery images if we don't have enough
                     const galleryIndex = i % project.gallery!.length;
                     const galleryImage = project.gallery![galleryIndex];
 
