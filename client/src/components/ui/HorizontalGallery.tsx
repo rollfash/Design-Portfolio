@@ -10,40 +10,41 @@ interface HorizontalGalleryProps {
 }
 
 // Define varied layout styles for a collage feel
-// Storing widths as numbers for calculation (vw units)
+// Mobile: Uniform card sizes for horizontal scroll
+// Desktop: Varied layout for visual interest
 const LAYOUT_CONFIG = [
   // 0: Large Hero Center
   {
-    widthMd: 50, // 50vw
-    container: "w-[85vw] md:w-[50vw] h-[60vh] md:h-[75vh] mt-0 z-10",
+    widthMd: 50,
+    container: "w-[75vw] md:w-[50vw] h-[50vh] md:h-[75vh] mt-0 z-10 flex-shrink-0",
     card: "shadow-xl border-primary/20",
     parallax: 0
   },
   // 1: Small Top Offset
   {
-    widthMd: 20, // 20vw
-    container: "w-[50vw] md:w-[20vw] h-[30vh] md:h-[35vh] -mt-[30vh] md:-mt-[40vh] z-0 opacity-90 grayscale-[30%] hover:grayscale-0",
+    widthMd: 20,
+    container: "w-[75vw] md:w-[20vw] h-[50vh] md:h-[35vh] md:-mt-[40vh] z-0 opacity-90 md:grayscale-[30%] md:hover:grayscale-0 flex-shrink-0",
     card: "shadow-md border-border",
     parallax: 50
   },
   // 2: Medium Bottom Offset
   {
-    widthMd: 25, // 25vw
-    container: "w-[60vw] md:w-[25vw] h-[40vh] md:h-[45vh] mt-[25vh] md:mt-[30vh] -ml-[10vw] md:-ml-[5vw] z-20",
+    widthMd: 25,
+    container: "w-[75vw] md:w-[25vw] h-[50vh] md:h-[45vh] md:mt-[30vh] md:-ml-[5vw] z-20 flex-shrink-0",
     card: "shadow-lg border-border",
     parallax: -30
   },
   // 3: Tall Portrait
   {
-    widthMd: 22, // 22vw
-    container: "w-[55vw] md:w-[22vw] h-[55vh] md:h-[65vh] mt-0 md:ml-[5vw] z-10",
+    widthMd: 22,
+    container: "w-[75vw] md:w-[22vw] h-[50vh] md:h-[65vh] md:ml-[5vw] z-10 flex-shrink-0",
     card: "shadow-lg border-border",
     parallax: 20
   },
   // 4: Small Bottom Far
   {
-    widthMd: 18, // 18vw
-    container: "w-[45vw] md:w-[18vw] h-[25vh] md:h-[30vh] mt-[40vh] z-0 opacity-80",
+    widthMd: 18,
+    container: "w-[75vw] md:w-[18vw] h-[50vh] md:h-[30vh] md:mt-[40vh] z-0 md:opacity-80 flex-shrink-0",
     card: "shadow-sm border-border",
     parallax: -60
   }
@@ -143,17 +144,23 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   );
 
   return (
-    <section ref={targetRef} className="relative h-[400vh]">
+    <section ref={targetRef} className="relative h-auto md:h-[400vh]">
       {/* Enhanced Depth Overlay for Collage Section */}
-      <div className="absolute inset-0 z-0 pointer-events-none" 
+      <div className="absolute inset-0 z-0 pointer-events-none hidden md:block" 
            style={{ 
              background: `radial-gradient(circle at 50% 50%, transparent 10%, hsla(var(--foreground) / 0.08) 100%)`,
            }}
       />
       
-      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+      <div className="md:sticky md:top-0 flex flex-col md:flex-row h-auto md:h-screen items-start md:items-center overflow-x-auto md:overflow-hidden">
         
-        {/* Header - Fixed Position */}
+        {/* Header - Mobile visible, Desktop positioned */}
+        <div className="w-full px-4 py-8 md:hidden">
+           <h2 className="text-lg font-bold uppercase tracking-widest text-primary mb-2">{t("home.featured.title")}</h2>
+           <div className="h-[2px] w-12 bg-primary/50"></div>
+        </div>
+        
+        {/* Header - Desktop Fixed Position */}
         <div className="absolute top-12 left-12 z-20 hidden md:block">
            <div className="text-start">
              <h2 className="text-xl font-bold uppercase tracking-widest text-primary mb-2">{t("home.featured.title")}</h2>
@@ -177,12 +184,9 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
           ref={scrollContainerRef}
           style={{ x }} 
           className={cn(
-            "flex items-center pl-[10vw] h-full w-max", // w-max ensures it doesn't wrap and takes full width
-            // Remove right padding to avoid empty space after last item
-            // The container will grow exactly to fit content
-            
-            // Mobile: Disable transform, use native scroll
-            "max-md:!transform-none max-md:overflow-x-auto max-md:h-auto max-md:block max-md:whitespace-nowrap max-md:w-full max-md:px-6 max-md:py-24 max-md:absolute max-md:inset-0"
+            "flex items-center pl-[10vw] h-full w-max",
+            "md:flex",
+            "max-md:!transform-none max-md:overflow-x-auto max-md:h-auto max-md:flex max-md:flex-row max-md:w-full max-md:px-4 max-md:py-12 max-md:gap-4 max-md:pl-4"
           )}
         >
           {projects.map((project, i) => {

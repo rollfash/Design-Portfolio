@@ -105,22 +105,39 @@ export function Navbar() {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="fixed inset-0 bg-background flex flex-col items-center justify-center gap-8 md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 bg-background flex flex-col items-center justify-center gap-6 md:hidden overflow-hidden"
             >
-              {links.map((link) => (
-                <Link key={link.href} href={link.href} className="text-2xl font-medium" onClick={() => setIsMobileMenuOpen(false)}>
+              {links.map((link, index) => (
+                <motion.div
+                  key={link.href}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Link 
+                    href={link.href} 
+                    className={cn(
+                      "text-2xl font-medium transition-colors",
+                      location === link.href ? "text-primary" : "text-foreground"
+                    )} 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
                     {link.label}
-                </Link>
+                  </Link>
+                </motion.div>
               ))}
               
-              <div className="flex gap-4 mt-4">
-                 <Button variant="outline" onClick={toggleLanguage}>
+              <div className="flex flex-col gap-3 mt-6 w-64">
+                 <Button variant="outline" onClick={toggleLanguage} className="w-full">
+                    <Globe className="h-4 w-4 mr-2" />
                     {language === 'he' ? 'Switch to English' : 'עבור לעברית'}
                  </Button>
-                 <Button variant="outline" onClick={toggleTheme}>
+                 <Button variant="outline" onClick={toggleTheme} className="w-full">
+                   {theme === 'light' ? <Moon className="h-4 w-4 mr-2" /> : <Sun className="h-4 w-4 mr-2" />}
                    {theme === 'light' ? t("nav.mode.dark") : t("nav.mode.light")}
                  </Button>
               </div>

@@ -30,10 +30,8 @@ export function ProjectDetail() {
     <Layout>
       <div className="container px-6 max-w-[1920px] pt-12 pb-24 flex flex-col items-center mx-auto">
         <div className="w-full max-w-6xl">
-          <Link href="/portfolio">
-            <a className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
-              <ArrowPrev className="h-4 w-4 mx-2" /> {t("project.back")}
-            </a>
+          <Link href="/portfolio" className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
+            <ArrowPrev className="h-4 w-4 mx-2" /> {t("project.back")}
           </Link>
 
           {/* Header - Centered for emphasis */}

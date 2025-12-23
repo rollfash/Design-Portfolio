@@ -21,10 +21,10 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-6 text-sm tracking-wider uppercase text-primary">{t("footer.menu")}</h4>
             <ul className="space-y-3">
-              <li><Link href="/portfolio"><a className="text-muted-foreground hover:text-primary transition-colors">{t("nav.portfolio")}</a></Link></li>
-              <li><Link href="/services"><a className="text-muted-foreground hover:text-primary transition-colors">{t("nav.services")}</a></Link></li>
-              <li><Link href="/about"><a className="text-muted-foreground hover:text-primary transition-colors">{t("nav.about")}</a></Link></li>
-              <li><Link href="/contact"><a className="text-muted-foreground hover:text-primary transition-colors">{t("nav.contact")}</a></Link></li>
+              <li><Link href="/portfolio" className="text-muted-foreground hover:text-primary transition-colors">{t("nav.portfolio")}</Link></li>
+              <li><Link href="/services" className="text-muted-foreground hover:text-primary transition-colors">{t("nav.services")}</Link></li>
+              <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">{t("nav.about")}</Link></li>
+              <li><Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">{t("nav.contact")}</Link></li>
             </ul>
           </div>
 
