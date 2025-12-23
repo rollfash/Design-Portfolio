@@ -1,6 +1,5 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { randomUUID } from 'crypto';
 import {
   type User,
@@ -18,14 +17,11 @@ interface FileStorageData {
   users?: User[];
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 export class FileStorage implements IStorage {
   private dataFile: string;
   private data: FileStorageData | null = null;
 
-  constructor(dataFilePath: string = path.join(__dirname, 'projects.json')) {
+  constructor(dataFilePath: string = path.join(process.cwd(), 'server', 'projects.json')) {
     this.dataFile = dataFilePath;
   }
 
@@ -41,23 +37,32 @@ export class FileStorage implements IStorage {
     } catch (error: any) {
       if (error.code === 'ENOENT') {
         console.log('Data file not found, creating new one');
-        this.data = { projects: [], contacts: [], users: [] };
-        await this.saveData();
-        return this.data;
+        const initialData: FileStorageData = { projects: [], contacts: [], users: [] };
+        this.data = initialData;
+        await this.saveData(initialData);
+        // Reload from disk to get fresh cached data after saveData invalidation
+        const fileContent = await fs.readFile(this.dataFile, 'utf-8');
+        this.data = JSON.parse(fileContent);
+        return this.data!;
       }
       console.error('Error loading data file:', error);
       throw new Error(`Failed to load data: ${error.message}`);
     }
   }
 
-  private async saveData(): Promise<void> {
-    if (!this.data) {
+  private async saveData(dataToSave: FileStorageData = this.data!): Promise<void> {
+    if (!dataToSave) {
       throw new Error('No data to save');
     }
 
     try {
-      const jsonContent = JSON.stringify(this.data, null, 2);
-      await fs.writeFile(this.dataFile, jsonContent, 'utf-8');
+      const jsonContent = JSON.stringify(dataToSave, null, 2);
+      // Atomic write: write to temp file then rename
+      const tempFile = `${this.dataFile}.tmp`;
+      await fs.writeFile(tempFile, jsonContent, 'utf-8');
+      await fs.rename(tempFile, this.dataFile);
+      // Invalidate cache after successful write to prevent stale data
+      this.data = null;
     } catch (error: any) {
       console.error('Error saving data file:', error);
       throw new Error(`Failed to save data: ${error.message}`);
@@ -87,7 +92,7 @@ export class FileStorage implements IStorage {
     };
 
     data.users.push(user);
-    await this.saveData();
+    await this.saveData(data);
     return user;
   }
 
@@ -131,7 +136,7 @@ export class FileStorage implements IStorage {
     };
 
     data.projects.push(project);
-    await this.saveData();
+    await this.saveData(data);
     
     console.log(`Project created: ${project.id} - ${project.title}`);
     return project;
@@ -145,14 +150,22 @@ export class FileStorage implements IStorage {
       return undefined;
     }
 
+    // Normalize undefined to null for schema compliance
+    const normalizedUpdate: any = {};
+    for (const [key, value] of Object.entries(updateData)) {
+      normalizedUpdate[key] = value === undefined ? null : value;
+    }
+
     data.projects[projectIndex] = {
       ...data.projects[projectIndex],
-      ...updateData,
+      ...normalizedUpdate,
     };
 
-    await this.saveData();
+    await this.saveData(data);
     console.log(`Project updated: ${id}`);
-    return data.projects[projectIndex];
+    // Reload to get fresh data after cache invalidation
+    const freshData = await this.loadData();
+    return freshData.projects.find(p => p.id === id);
   }
 
   async deleteProject(id: string): Promise<boolean> {
@@ -164,7 +177,7 @@ export class FileStorage implements IStorage {
       return false;
     }
 
-    await this.saveData();
+    await this.saveData(data);
     console.log(`Project deleted: ${id}`);
     return true;
   }
@@ -193,7 +206,7 @@ export class FileStorage implements IStorage {
     };
 
     data.contacts.push(submission);
-    await this.saveData();
+    await this.saveData(data);
     
     console.log(`Contact submission created: ${submission.id} from ${submission.email}`);
     return submission;
