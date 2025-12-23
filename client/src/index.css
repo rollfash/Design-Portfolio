@@ -59,23 +59,29 @@
   --primary-foreground: 40 10% 97%;
 
   /* Soft Beige/Warm Gray Secondary */
-  --secondary: 30 10% 92%;
+  --secondary: 30 15% 94%; /* Slightly warmer */
   --secondary-foreground: 30 6% 25%;
 
   /* Muted Text */
-  --muted: 30 5% 85%;
-  --muted-foreground: 0 0% 40%;
+  --muted: 30 10% 90%;
+  --muted-foreground: 30 4% 45%;
 
-  /* Subtle Accent */
-  --accent: 30 10% 92%;
+  /* Subtle Accent (Muted Warm Stone/Highlights) */
+  --accent: 35 20% 94%; 
   --accent-foreground: 30 6% 35%;
+
+  /* Brand Colors - Muted/Tasteful */
+  --brand-olive: 60 10% 45%;   /* Deep Olive */
+  --brand-teal: 170 15% 45%;   /* Muted Teal */
+  --brand-stone: 30 15% 55%;   /* Warm Stone */
+  --brand-wash: 35 30% 96%;    /* Very pale wash */
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 60 10% 98%;
 
   /* Light Border */
-  --border: 30 5% 85%;
-  --input: 30 5% 85%;
+  --border: 30 10% 88%;
+  --input: 30 10% 88%;
   --ring: 30 6% 35%;
 
   --radius: 0.25rem;
@@ -93,17 +99,23 @@
   --popover-foreground: 40 10% 97%;
 
   /* Lighter Taupe for Dark Mode */
-  --primary: 30 10% 70%;
+  --primary: 30 15% 75%;
   --primary-foreground: 0 0% 10%;
 
   --secondary: 0 0% 16%;
   --secondary-foreground: 40 10% 97%;
 
   --muted: 0 0% 18%;
-  --muted-foreground: 0 0% 60%;
+  --muted-foreground: 0 0% 65%;
 
   --accent: 30 6% 25%;
   --accent-foreground: 30 10% 80%;
+
+  /* Brand Colors - Dark Mode Adaptations */
+  --brand-olive: 60 10% 65%;   
+  --brand-teal: 170 15% 65%;   
+  --brand-stone: 30 15% 65%;   
+  --brand-wash: 30 10% 14%;    /* Dark wash */
 
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 60 10% 98%;
@@ -120,18 +132,31 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Subtle Grid Background with Vignette */
+    /* Subtle Grid Background with Vignette & Tint */
     background-image: 
       /* Radial Vignette: Brighter center, subtle falloff to edges */
-      radial-gradient(circle at 50% 40%, transparent 10%, hsla(var(--foreground) / 0.03) 90%),
-      /* Grid Lines */
-      linear-gradient(to right, hsla(var(--border) / 0.15) 1px, transparent 1px),
-      linear-gradient(to bottom, hsla(var(--border) / 0.15) 1px, transparent 1px);
+      radial-gradient(circle at 50% 40%, transparent 10%, hsla(var(--foreground) / 0.05) 90%),
+      /* Grid Lines - Tinted with brand-stone */
+      linear-gradient(to right, hsla(var(--brand-stone) / 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, hsla(var(--brand-stone) / 0.08) 1px, transparent 1px);
     background-size: 100% 100%, 60px 60px, 60px 60px;
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight;
+  }
+}
+
+/* Utilities for new color touches */
+@layer utilities {
+  .bg-hero-wash {
+    background: radial-gradient(circle at 50% 30%, hsla(var(--brand-wash) / 1) 0%, transparent 70%);
+  }
+  .bg-hero-wash-dark {
+    background: radial-gradient(circle at 50% 30%, hsla(var(--brand-wash) / 0.5) 0%, transparent 70%);
+  }
+  .text-brand-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--brand-stone))] to-[hsl(var(--brand-olive))];
   }
 }
 

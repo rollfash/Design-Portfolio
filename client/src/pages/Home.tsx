@@ -48,10 +48,17 @@ export function Home() {
         {/* Sticky Hero Content */}
         <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col items-center justify-center">
             
+            {/* NEW: Hero Background Treatment */}
+            {/* 1. Base Wash */}
+            <div className="absolute inset-0 z-0 bg-hero-wash dark:bg-hero-wash-dark opacity-80 pointer-events-none transition-colors duration-500" />
+            
+            {/* 2. Soft Gradient Overlay (Two-tone) */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-tr from-[hsl(var(--brand-stone))]/5 via-transparent to-[hsl(var(--brand-teal))]/5 pointer-events-none mix-blend-overlay" />
+
             {/* Background Typography - Parallax Layer */}
             <motion.div 
               style={{ y: bgTextY }}
-              className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-[0.03] overflow-hidden"
+              className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-[0.04] overflow-hidden"
             >
                <div className="font-bold text-[15vw] leading-none whitespace-nowrap text-foreground/50">
                  {language === 'he' ? "חללי חוויה" : "EXPERIENCE SPACES"}
@@ -65,7 +72,7 @@ export function Home() {
             <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
                <Signature 
                  progress={signatureProgress} 
-                 className="w-[80vw] max-w-[600px] text-primary opacity-80 mix-blend-multiply dark:mix-blend-screen" 
+                 className="w-[80vw] max-w-[600px] text-primary opacity-90 mix-blend-multiply dark:mix-blend-screen drop-shadow-sm" 
                />
             </div>
 
@@ -82,11 +89,14 @@ export function Home() {
                     transition={{ duration: 0.8, delay: 0.2 }}
                     className="mb-12 relative"
                   >
-                    <div className="relative rounded-full p-[2px] bg-gradient-to-tr from-border via-background to-border shadow-xl">
+                    {/* NEW: Faint Color Halo behind Avatar */}
+                    <div className="absolute inset-0 -m-8 rounded-full bg-[hsl(var(--brand-stone))] blur-3xl opacity-20 dark:opacity-10 animate-pulse-slow pointer-events-none" />
+                    
+                    <div className="relative rounded-full p-[3px] bg-gradient-to-tr from-[hsl(var(--brand-stone))] via-background to-[hsl(var(--brand-olive))] shadow-xl">
                       <img 
                         src="/avatar.jpg" 
                         alt={language === 'he' ? "גל שינהורן - פורטרט" : "Gal Shinhorn - Portrait"} 
-                        className="w-[110px] h-[110px] md:w-[140px] md:h-[140px] rounded-full object-cover border-4 border-background"
+                        className="w-[110px] h-[110px] md:w-[140px] md:h-[140px] rounded-full object-cover border-4 border-background/90"
                       />
                     </div>
                   </motion.div>
