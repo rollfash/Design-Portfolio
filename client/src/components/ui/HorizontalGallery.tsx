@@ -83,33 +83,53 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   // Smooth out the scroll progress
   const smoothProgress = useSpring(scrollYProgress, { damping: 40, stiffness: 200 });
 
+  // Debug toggle
+  const DEBUG = false;
+
   // Measure actual content width to prevent overshoot
   useEffect(() => {
-    // Small delay to ensure layout is settled
-    const timer = setTimeout(() => {
+    const updateScrollRange = () => {
       if (scrollContainerRef.current) {
         const scrollWidth = scrollContainerRef.current.scrollWidth;
-        const clientWidth = scrollContainerRef.current.clientWidth;
+        // Use the sticky parent's width (viewport) to calculate overflow
+        const viewportWidth = scrollContainerRef.current.parentElement?.clientWidth || window.innerWidth;
         // The max scroll distance is total width - visible width
-        const maxScroll = Math.max(0, scrollWidth - clientWidth);
+        const maxScroll = Math.max(0, scrollWidth - viewportWidth);
         setScrollRange(maxScroll);
-      }
-    }, 100);
 
-    const handleResize = () => {
-      if (scrollContainerRef.current && targetRef.current) {
-         const scrollWidth = scrollContainerRef.current.scrollWidth;
-         const viewportWidth = window.innerWidth; // Use window width as the viewport
-         setScrollRange(Math.max(0, scrollWidth - viewportWidth));
+        if (DEBUG) {
+          console.log("[HorizontalGallery] Measurement:", {
+            scrollWidth,
+            viewportWidth,
+            maxScroll,
+            container: scrollContainerRef.current
+          });
+        }
       }
     };
 
-    // Initial calculation
-    handleResize();
+    // Initial check
+    updateScrollRange();
+    
+    // Check after a short delay to allow layout to settle
+    const timer = setTimeout(updateScrollRange, 500);
 
-    window.addEventListener('resize', handleResize);
+    // Use ResizeObserver for robust updates
+    const observer = new ResizeObserver(() => {
+      updateScrollRange();
+    });
+
+    if (scrollContainerRef.current) {
+      observer.observe(scrollContainerRef.current);
+    }
+    
+    // Also observe the parent to catch viewport changes
+    if (scrollContainerRef.current?.parentElement) {
+      observer.observe(scrollContainerRef.current.parentElement);
+    }
+
     return () => {
-      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
       clearTimeout(timer);
     };
   }, [projects]);
@@ -157,7 +177,7 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
           ref={scrollContainerRef}
           style={{ x }} 
           className={cn(
-            "flex items-center pl-[10vw] h-full w-fit",
+            "flex items-center pl-[10vw] h-full w-max", // w-max ensures it doesn't wrap and takes full width
             // Remove right padding to avoid empty space after last item
             // The container will grow exactly to fit content
             
