@@ -83,7 +83,8 @@ export async function registerRoutes(
       // Send email notification via Resend
       try {
         const { client, fromEmail } = await getResendClient();
-        await client.emails.send({
+        console.log("Sending email from:", fromEmail || 'onboarding@resend.dev');
+        const result = await client.emails.send({
           from: fromEmail || 'onboarding@resend.dev',
           to: 'galart1@gmail.com',
           subject: `New Contact Form Submission from ${validatedData.name}`,
@@ -97,9 +98,9 @@ export async function registerRoutes(
             <p>${validatedData.message}</p>
           `
         });
-        console.log("Email notification sent to galart1@gmail.com");
-      } catch (emailError) {
-        console.error("Failed to send email notification:", emailError);
+        console.log("Email send result:", JSON.stringify(result));
+      } catch (emailError: any) {
+        console.error("Failed to send email notification:", emailError?.message || emailError);
         // Don't fail the request if email fails - submission is still saved
       }
       
