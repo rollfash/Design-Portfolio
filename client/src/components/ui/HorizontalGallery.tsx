@@ -97,12 +97,15 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
     }, 100);
 
     const handleResize = () => {
-      if (scrollContainerRef.current) {
+      if (scrollContainerRef.current && targetRef.current) {
          const scrollWidth = scrollContainerRef.current.scrollWidth;
-         const clientWidth = scrollContainerRef.current.clientWidth;
-         setScrollRange(Math.max(0, scrollWidth - clientWidth));
+         const viewportWidth = window.innerWidth; // Use window width as the viewport
+         setScrollRange(Math.max(0, scrollWidth - viewportWidth));
       }
     };
+
+    // Initial calculation
+    handleResize();
 
     window.addEventListener('resize', handleResize);
     return () => {
