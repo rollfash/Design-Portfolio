@@ -117,8 +117,9 @@ export function Navbar() {
         )}
       >
         <div className="container mx-auto px-6 max-w-[1920px] flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold tracking-tight">
-              Gal Shinhorn
+          <Link href="/" className="flex flex-col">
+              <span className="text-xl md:text-2xl font-bold tracking-tight">Gal Shinhorn</span>
+              <span className="text-[10px] md:text-xs text-muted-foreground uppercase tracking-widest">Production Designer</span>
           </Link>
 
           {/* Desktop Nav */}

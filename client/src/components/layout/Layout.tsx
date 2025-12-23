@@ -11,9 +11,9 @@ export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
 
   return (
-    <div className="min-h-screen text-foreground flex flex-col font-sans">
+    <div className="min-h-screen text-foreground flex flex-col font-sans overflow-x-hidden max-w-[100vw]">
       <Navbar />
-      <main className="flex-grow pt-24">
+      <main className="flex-grow pt-24 overflow-x-hidden">
         {/* Page transition wrapper */}
         <motion.div
           key={location}
@@ -21,6 +21,7 @@ export function Layout({ children }: LayoutProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
+          className="overflow-x-hidden"
         >
           {children}
         </motion.div>

@@ -56,10 +56,10 @@ export function Home() {
             {/* 2. Soft Gradient Overlay (Two-tone) */}
             <div className="absolute inset-0 z-0 bg-gradient-to-tr from-[hsl(var(--brand-stone))]/5 via-transparent to-[hsl(var(--brand-teal))]/5 pointer-events-none mix-blend-overlay" />
 
-            {/* Background Typography - Parallax Layer */}
+            {/* Background Typography - Parallax Layer (hidden on mobile for accessibility) */}
             <motion.div 
               style={{ y: bgTextY }}
-              className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none select-none opacity-[0.04] overflow-hidden"
+              className="absolute inset-0 z-0 hidden md:flex flex-col items-center justify-center pointer-events-none select-none opacity-[0.04] overflow-hidden"
             >
                <div className="font-bold text-[15vw] leading-none whitespace-nowrap text-foreground/50">
                  {language === 'he' ? "חללי חוויה" : "EXPERIENCE SPACES"}
@@ -69,8 +69,8 @@ export function Home() {
                </div>
             </motion.div>
 
-            {/* Signature Overlay - Draws on Scroll */}
-            <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
+            {/* Signature Overlay - Draws on Scroll (hidden on mobile) */}
+            <div className="absolute inset-0 z-0 hidden md:flex items-center justify-center pointer-events-none">
                <Signature 
                  progress={signatureProgress} 
                  className="w-[45vw] max-w-[500px] text-primary opacity-60 mix-blend-multiply dark:mix-blend-screen drop-shadow-sm" 
@@ -109,9 +109,8 @@ export function Home() {
                     className="w-full max-w-4xl mx-auto mb-20 text-center"
                   >
                      {/* Dynamic Language Content - Centered Single Block */}
-                     <div className="text-muted-foreground text-[10px] md:text-sm leading-relaxed space-y-6">
-                        <p>{t("hero." + language + ".p1")}</p>
-                        <p>{t("hero." + language + ".p2")}</p>
+                     <div className="text-muted-foreground text-xs md:text-sm leading-relaxed">
+                        <p>{t("hero." + language + ".p1")} {language === 'he' ? "חללים, במות וסטים משפיעים" : "Impactful spaces, stages and sets."}</p>
                      </div>
                   </motion.div>
 
