@@ -11,7 +11,7 @@ export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
+    <div className="min-h-screen text-foreground flex flex-col font-sans">
       <Navbar />
       <main className="flex-grow pt-24">
         {/* Page transition wrapper */}

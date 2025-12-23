@@ -47,29 +47,23 @@ export function Navbar() {
       )}
     >
       <div className="container mx-auto px-6 max-w-[1920px] flex items-center justify-between">
-        <Link href="/">
-          <a className="text-2xl font-bold tracking-tight z-50 relative">
+        <Link href="/" className="text-2xl font-bold tracking-tight z-50 relative">
             Gal Shinhorn
-          </a>
         </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {links.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <a
-                className={cn(
+            <Link key={link.href} href={link.href} className={cn(
                   "text-base font-medium transition-colors hover:text-primary/70 relative group",
                   location === link.href ? "text-primary" : "text-muted-foreground"
-                )}
-              >
+                )}>
                 {link.label}
                 <span className={cn(
                   "absolute -bottom-1 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full",
                    language === 'he' ? "right-0" : "left-0",
                    location === link.href ? "w-full" : ""
                 )} />
-              </a>
             </Link>
           ))}
           
@@ -113,13 +107,8 @@ export function Navbar() {
               className="fixed inset-0 bg-background flex flex-col items-center justify-center gap-8 md:hidden"
             >
               {links.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <a
-                    className="text-2xl font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
+                <Link key={link.href} href={link.href} className="text-2xl font-medium" onClick={() => setIsMobileMenuOpen(false)}>
                     {link.label}
-                  </a>
                 </Link>
               ))}
               

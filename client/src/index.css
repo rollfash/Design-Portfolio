@@ -120,11 +120,14 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    /* Subtle Grid Background */
+    /* Subtle Grid Background with Vignette */
     background-image: 
-      linear-gradient(to right, hsla(var(--border) / 0.3) 1px, transparent 1px),
-      linear-gradient(to bottom, hsla(var(--border) / 0.3) 1px, transparent 1px);
-    background-size: 80px 80px;
+      /* Radial Vignette: Brighter center, subtle falloff to edges */
+      radial-gradient(circle at 50% 40%, transparent 10%, hsla(var(--foreground) / 0.03) 90%),
+      /* Grid Lines */
+      linear-gradient(to right, hsla(var(--border) / 0.15) 1px, transparent 1px),
+      linear-gradient(to bottom, hsla(var(--border) / 0.15) 1px, transparent 1px);
+    background-size: 100% 100%, 60px 60px, 60px 60px;
     background-attachment: fixed;
   }
   h1, h2, h3, h4, h5, h6 {

@@ -100,12 +100,11 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   const x = useTransform(smoothProgress, [0, 1], ["0%", isRTL ? `${scrollRange}%` : `-${scrollRange}%`]);
 
   return (
-    <section ref={targetRef} className="relative h-[400vh] bg-background">
-      {/* Background Pattern - subtle contour/grid */}
-      <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none" 
+    <section ref={targetRef} className="relative h-[400vh]">
+      {/* Enhanced Depth Overlay for Collage Section */}
+      <div className="absolute inset-0 z-0 pointer-events-none" 
            style={{ 
-             backgroundImage: `radial-gradient(circle at 2px 2px, black 1px, transparent 0)`,
-             backgroundSize: '40px 40px' 
+             background: `radial-gradient(circle at 50% 50%, transparent 10%, hsla(var(--foreground) / 0.08) 100%)`,
            }}
       />
       
