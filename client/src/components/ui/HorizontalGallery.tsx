@@ -35,15 +35,24 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   // Measurement: calculate dimensions after images load
   useEffect(() => {
     const measure = () => {
-      if (!viewportRef.current || !trackRef.current) return;
+      if (!viewportRef.current || !trackRef.current || !wrapperRef.current) return;
       
       const viewportWidth = viewportRef.current.clientWidth;
       const trackWidth = trackRef.current.scrollWidth;
       const maxScroll = Math.max(0, trackWidth - viewportWidth);
       
-      // Wrapper height = viewport height + maxScroll for 1:1 scroll mapping
+      // Precise wrapper height calculation:
+      // wrapperHeight = viewportHeight + maxScroll
+      // This ensures: scrollDistance = maxScroll (the exact horizontal travel needed)
       const viewportHeight = window.innerHeight;
-      const wrapperHeight = maxScroll > 0 ? viewportHeight + maxScroll : viewportHeight;
+      const wrapperHeight = viewportHeight + maxScroll;
+      
+      // Apply height directly to wrapper to prevent browser rounding issues
+      if (maxScroll > 0) {
+        wrapperRef.current.style.height = `${wrapperHeight}px`;
+      } else {
+        wrapperRef.current.style.height = `${viewportHeight}px`;
+      }
       
       setMeasurements({ viewportWidth, trackWidth, maxScroll, wrapperHeight });
     };
@@ -83,18 +92,24 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
     const handleScroll = () => {
       if (!wrapperRef.current || !trackRef.current) return;
       
-      const rect = wrapperRef.current.getBoundingClientRect();
       const scrollY = window.scrollY;
       const wrapperTop = wrapperRef.current.offsetTop;
       const viewportHeight = window.innerHeight;
       
-      // Progress: 0 when wrapper top hits viewport top, 1 when wrapper bottom leaves viewport bottom
-      const scrollDistance = measurements.wrapperHeight - viewportHeight;
-      const progress = scrollDistance > 0 
-        ? Math.max(0, Math.min(1, (scrollY - wrapperTop) / scrollDistance))
-        : 0;
+      // Precise progress calculation:
+      // scrollDistance should equal maxScroll (horizontal travel needed)
+      // wrapperHeight = viewportHeight + maxScroll
+      // scrollDistance = wrapperHeight - viewportHeight = maxScroll
+      const scrollDistance = measurements.maxScroll;
       
-      // Translate track horizontally (RTL support)
+      // Raw progress (can exceed 0-1 range during scroll)
+      const rawProgress = (scrollY - wrapperTop) / scrollDistance;
+      
+      // Clamped progress (0 to 1)
+      const progress = Math.max(0, Math.min(1, rawProgress));
+      
+      // Translate track horizontally (clamped to prevent overshoot)
+      // At progress=1, translateX should be exactly ±maxScroll
       const translateX = (isRTL ? 1 : -1) * progress * measurements.maxScroll;
       trackRef.current.style.transform = `translateX(${translateX}px)`;
     };
@@ -148,8 +163,7 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   return (
     <section 
       ref={wrapperRef}
-      className="relative"
-      style={{ height: measurements.wrapperHeight > 0 ? `${measurements.wrapperHeight}px` : '100vh' }}
+      className="relative m-0 p-0"
     >
       <div 
         ref={viewportRef}
