@@ -24,11 +24,11 @@ export function ProjectCard({ id, title, category, image, year, className }: Pro
         whileHover={{ y: -5 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="relative overflow-hidden aspect-[4/5] bg-muted mb-4 group-hover:border-transparent">
+        <div className="relative overflow-hidden aspect-[4/5] bg-secondary/20 mb-4 group-hover:border-transparent">
           <motion.img 
             src={imageSrc} 
             alt={title}
-            className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+            className="object-contain w-full h-full transition-transform duration-700 group-hover:scale-105"
           />
           {/* Overlay Text - Always visible overlay for readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none transition-opacity duration-500" />

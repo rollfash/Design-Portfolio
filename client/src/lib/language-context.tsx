@@ -48,10 +48,9 @@ const translations: Record<string, Record<Language, string>> = {
   "portfolio.title": { he: "עבודות נבחרות", en: "Selected Work" },
   "portfolio.subtitle": { he: "אוסף חללים נבחרים שתוכננו למגורים, עבודה והופעה.", en: "A curated collection of spaces designed for living, working, and performance." },
   "filter.all": { he: "הכל", en: "All" },
-  "filter.exhibitions": { he: "תערוכות", en: "Exhibitions" },
-  "filter.experience": { he: "חללי חוויה", en: "Experience Spaces" },
   "filter.set_design": { he: "עיצוב סט", en: "Set Design" },
-  "filter.styling": { he: "סטיילינג", en: "Styling" },
+  "filter.stage_event": { he: "עיצוב במה ואירועים", en: "Stage & Event Design" },
+  "filter.commercial": { he: "עיצוב מסחרי", en: "Commercial Design" },
 
   // Services Page
   "services.hero.title": { he: "שירותים", en: "Services" },

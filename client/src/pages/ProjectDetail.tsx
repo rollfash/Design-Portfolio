@@ -71,11 +71,11 @@ export function ProjectDetail() {
                const isVideo = media.startsWith("data:video") || media.endsWith(".mp4") || media.endsWith(".webm");
                
                return (
-                  <div key={i} className={`relative group overflow-hidden ${i === 0 ? "md:col-span-2 aspect-video" : "aspect-[4/5]"}`}>
+                  <div key={i} className={`relative group overflow-hidden bg-secondary/20 ${i === 0 ? "md:col-span-2 aspect-video" : "aspect-[4/5]"}`}>
                      {isVideo ? (
                         <video 
                            src={media} 
-                           className="w-full h-full object-cover"
+                           className="w-full h-full object-contain"
                            controls
                            muted
                            loop
@@ -84,7 +84,7 @@ export function ProjectDetail() {
                         <img 
                            src={media} 
                            alt={`Project detail ${i+1}`} 
-                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                           className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                         />
                      )}
                   </div>

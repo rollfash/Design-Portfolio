@@ -12,9 +12,9 @@ export function Portfolio() {
 
   const FILTERS = [
     { id: "All", label: t("filter.all"), originalId: "All" },
-    { id: "תערוכות", label: t("filter.exhibitions"), originalId: "תערוכות" },
-    { id: "חלל חוויה", label: t("filter.experience"), originalId: "חלל חוויה" },
-    { id: "עיצוב סט", label: t("filter.set_design"), originalId: "עיצוב סט" }
+    { id: "עיצוב סט", label: t("filter.set_design"), originalId: "עיצוב סט" },
+    { id: "עיצוב במה ואירועים", label: t("filter.stage_event"), originalId: "עיצוב במה ואירועים" },
+    { id: "עיצוב מסחרי", label: t("filter.commercial"), originalId: "עיצוב מסחרי" }
   ];
 
   const filteredProjects = activeFilter === "All" 
