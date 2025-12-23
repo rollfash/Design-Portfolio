@@ -108,7 +108,7 @@ export function Home() {
                     className="w-full max-w-4xl mx-auto mb-20 text-center"
                   >
                      {/* Dynamic Language Content - Centered Single Block */}
-                     <div className="text-muted-foreground text-base md:text-xl leading-relaxed space-y-6">
+                     <div className="text-muted-foreground text-sm md:text-lg leading-relaxed space-y-6">
                         <p>{t("hero." + language + ".p1")}</p>
                         <p>{t("hero." + language + ".p2")}</p>
                      </div>
