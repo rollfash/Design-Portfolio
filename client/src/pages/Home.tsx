@@ -7,7 +7,8 @@ import { Link } from "wouter";
 import { motion, useScroll, useTransform, useSpring, useReducedMotion } from "framer-motion";
 import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
-import { useRef } from "react";
+import { getMostRecentProjects } from "@/lib/project-utils";
+import { useRef, useMemo } from "react";
 
 export function Home() {
   const { projects } = useProjects();
@@ -36,8 +37,8 @@ export function Home() {
   // Reduced motion overrides
   const finalScale = shouldReduceMotion ? 1 : heroScale;
   
-  // Take featured projects
-  const featuredProjects = projects.slice(0, 6); // Take up to 6 for the horizontal scroll
+  // Get most recent projects for horizontal scroll gallery (memoized for performance)
+  const featuredProjects = useMemo(() => getMostRecentProjects(projects, 6), [projects]);
   const ArrowIcon = direction === 'rtl' ? ArrowLeft : ArrowRight;
 
   return (
