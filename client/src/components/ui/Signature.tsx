@@ -20,15 +20,15 @@ export function Signature({ progress, className }: SignatureProps) {
   return (
     <div className={cn("pointer-events-none select-none", className)}>
       <svg
-        viewBox="0 0 400 200"
+        viewBox="0 0 500 300"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"
       >
         <motion.path
-          d="M160 240 C 170 200, 240 80, 260 60 C 255 90, 220 160, 210 180 C 230 160, 280 140, 300 130"
+          d="M 150 200 C 140 180, 160 140, 180 130 C 200 120, 220 140, 210 160 C 200 180, 180 170, 190 150 C 200 130, 250 80, 280 70 C 290 65, 260 120, 250 140 C 240 160, 240 180, 260 170 C 280 160, 300 140, 320 130 C 330 125, 340 120, 350 130 C 360 140, 340 160, 330 170 M 200 180 C 220 180, 300 160, 350 150"
           stroke="currentColor"
-          strokeWidth="3"
+          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
           className="text-primary drop-shadow-sm opacity-90"
