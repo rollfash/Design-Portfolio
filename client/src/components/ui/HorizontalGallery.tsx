@@ -8,7 +8,7 @@ interface HorizontalGalleryProps {
   projects: Project[];
 }
 
-// Varied layout styles for collage effect (desktop only)
+// Varied layout styles for collage effect
 const LAYOUT_CONFIG = [
   { container: "w-[85vw] md:w-[45vw] h-[60vh] md:h-[70vh]", card: "shadow-xl border-primary/20" },
   { container: "w-[85vw] md:w-[30vw] h-[60vh] md:h-[50vh]", card: "shadow-lg border-border" },
@@ -22,37 +22,48 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   
-  const [measurements, setMeasurements] = useState({
-    viewportWidth: 0,
-    trackWidth: 0,
-    maxScroll: 0
-  });
-  
-  // Track horizontal scroll progress (0 to maxScroll in pixels)
-  const progressRef = useRef(0);
-  const isLockedRef = useRef(false);
+  const [maxScroll, setMaxScroll] = useState(0);
+  const [wrapperHeight, setWrapperHeight] = useState('100vh');
+  const [isMobile, setIsMobile] = useState(false);
   
   const { language, direction, t } = useLanguage();
   const isRTL = direction === 'rtl';
 
+  // Detect mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Measurement: calculate dimensions after images load
   useEffect(() => {
+    if (isMobile) return;
+    
     const measure = () => {
-      if (!viewportRef.current || !trackRef.current) return;
+      if (!viewportRef.current || !trackRef.current || !wrapperRef.current) return;
       
       const viewportWidth = viewportRef.current.clientWidth;
       const trackWidth = trackRef.current.scrollWidth;
-      const maxScroll = Math.max(0, trackWidth - viewportWidth);
+      const overflow = Math.max(0, trackWidth - viewportWidth);
       
-      setMeasurements({ viewportWidth, trackWidth, maxScroll });
+      // Wrapper height = viewport height + overflow
+      // This creates the scroll distance needed for horizontal travel
+      const viewportHeight = window.innerHeight;
+      const totalHeight = viewportHeight + overflow;
+      
+      setMaxScroll(overflow);
+      setWrapperHeight(`${totalHeight}px`);
     };
 
     measure();
     
     // Delayed measurements for image loading
     const t1 = setTimeout(measure, 100);
-    const t2 = setTimeout(measure, 500);
-    const t3 = setTimeout(measure, 1000);
+    const t2 = setTimeout(measure, 300);
+    const t3 = setTimeout(measure, 600);
+    const t4 = setTimeout(measure, 1000);
 
     // ResizeObserver for dynamic updates
     const observer = new ResizeObserver(measure);
@@ -70,132 +81,49 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      clearTimeout(t4);
       images?.forEach(img => img.removeEventListener('load', measure));
       window.removeEventListener('resize', measure);
     };
-  }, [projects]);
+  }, [projects, isMobile]);
 
-  // Scroll lock handler: intercept wheel/touch events and convert to horizontal translation
+  // Scroll handler: translate track based on scroll position
   useEffect(() => {
-    if (!wrapperRef.current || !trackRef.current || measurements.maxScroll <= 0) return;
+    if (isMobile || !wrapperRef.current || !trackRef.current || maxScroll <= 0) return;
 
-    const updateTransform = () => {
-      if (!trackRef.current) return;
+    const handleScroll = () => {
+      if (!wrapperRef.current || !trackRef.current) return;
       
-      // Clamp progress between 0 and maxScroll
-      const clampedProgress = Math.max(0, Math.min(measurements.maxScroll, progressRef.current));
-      progressRef.current = clampedProgress;
+      const wrapperRect = wrapperRef.current.getBoundingClientRect();
+      const scrollY = window.scrollY;
+      const wrapperTop = wrapperRef.current.offsetTop;
+      const viewportHeight = window.innerHeight;
       
-      // Apply horizontal translation
-      const translateX = (isRTL ? 1 : -1) * clampedProgress;
+      // Calculate progress: 0 at start, 1 at end
+      // scrollDistance = wrapperHeight - viewportHeight = maxScroll
+      const progress = Math.max(0, Math.min(1, (scrollY - wrapperTop) / maxScroll));
+      
+      // Translate track horizontally
+      const translateX = (isRTL ? 1 : -1) * progress * maxScroll;
       trackRef.current.style.transform = `translateX(${translateX}px)`;
     };
 
-    const handleWheel = (e: WheelEvent) => {
-      if (!wrapperRef.current) return;
-      
-      const rect = wrapperRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      
-      // Check if gallery section is in view
-      const isInView = rect.top <= 0 && rect.bottom > viewportHeight;
-      
-      if (!isInView) {
-        isLockedRef.current = false;
-        return;
-      }
-      
-      // Gallery is in view - check if we should lock
-      const scrollingDown = e.deltaY > 0;
-      const scrollingUp = e.deltaY < 0;
-      
-      // Lock conditions:
-      // 1. Scrolling down and haven't finished horizontal travel
-      // 2. Scrolling up and horizontal progress > 0
-      const shouldLock = (scrollingDown && progressRef.current < measurements.maxScroll) ||
-                        (scrollingUp && progressRef.current > 0);
-      
-      if (shouldLock) {
-        e.preventDefault();
-        isLockedRef.current = true;
-        
-        // Convert vertical scroll to horizontal progress
-        // Use deltaY directly for 1:1 mapping
-        const delta = e.deltaY;
-        progressRef.current += delta;
-        
-        updateTransform();
-      } else {
-        isLockedRef.current = false;
-      }
-    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Set initial position
 
-    const handleTouchStart = (e: TouchEvent) => {
-      if (!wrapperRef.current) return;
-      const rect = wrapperRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const isInView = rect.top <= 0 && rect.bottom > viewportHeight;
-      
-      if (isInView) {
-        (e.target as any)._touchStartY = e.touches[0].clientY;
-        (e.target as any)._lastProgress = progressRef.current;
-      }
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [maxScroll, isRTL, isMobile]);
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!wrapperRef.current) return;
-      
-      const rect = wrapperRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const isInView = rect.top <= 0 && rect.bottom > viewportHeight;
-      
-      if (!isInView) return;
-      
-      const touchStartY = (e.target as any)._touchStartY;
-      if (touchStartY === undefined) return;
-      
-      const currentY = e.touches[0].clientY;
-      const deltaY = touchStartY - currentY; // Positive = swipe up
-      
-      const shouldLock = (deltaY > 0 && progressRef.current < measurements.maxScroll) ||
-                        (deltaY < 0 && progressRef.current > 0);
-      
-      if (shouldLock) {
-        e.preventDefault();
-        
-        const lastProgress = (e.target as any)._lastProgress || 0;
-        progressRef.current = lastProgress + deltaY;
-        
-        updateTransform();
-      }
-    };
-
-    // Use non-passive listeners to allow preventDefault
-    wrapperRef.current.addEventListener('wheel', handleWheel, { passive: false });
-    wrapperRef.current.addEventListener('touchstart', handleTouchStart, { passive: true });
-    wrapperRef.current.addEventListener('touchmove', handleTouchMove, { passive: false });
-
-    const wrapper = wrapperRef.current;
-    
-    return () => {
-      wrapper.removeEventListener('wheel', handleWheel);
-      wrapper.removeEventListener('touchstart', handleTouchStart);
-      wrapper.removeEventListener('touchmove', handleTouchMove);
-    };
-  }, [measurements, isRTL]);
-
-  // Mobile fallback: horizontal swipeable track
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  
+  // Mobile: horizontal swipeable track (no scroll lock)
   if (isMobile) {
     return (
-      <section className="py-12 bg-secondary/20">
+      <section className="py-12 bg-secondary/10">
         <div className="px-6">
           <h2 className="text-xl font-bold uppercase tracking-widest text-primary mb-6">{t("home.featured.title")}</h2>
           <div className="h-[2px] w-12 bg-primary/50 mb-8"></div>
           
           {/* Horizontal swipeable track */}
-          <div className="overflow-x-auto overflow-y-hidden pb-4 -mx-6 px-6">
+          <div className="overflow-x-auto overflow-y-hidden pb-4 -mx-6 px-6 scrollbar-hide">
             <div className="flex gap-4" style={{ width: 'max-content' }}>
               {projects.map((project, i) => {
                 const layoutStyle = LAYOUT_CONFIG[i % LAYOUT_CONFIG.length];
@@ -223,11 +151,12 @@ export function HorizontalGallery({ projects }: HorizontalGalleryProps) {
     );
   }
 
-  // Desktop: pinned horizontal scroll effect with scroll lock
+  // Desktop: pinned horizontal scroll driven by vertical scroll
   return (
     <section 
       ref={wrapperRef}
-      className="relative m-0 p-0 h-screen"
+      className="relative"
+      style={{ height: wrapperHeight }}
     >
       <div 
         ref={viewportRef}
