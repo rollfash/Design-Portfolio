@@ -22,14 +22,20 @@ export function Home() {
         
         <div className="container px-6 max-w-[1920px] z-10 relative flex flex-col items-center mx-auto">
           
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-6xl md:text-8xl lg:text-9xl font-bold leading-[1.1] mb-24 text-center tracking-tight"
+            className="mb-12 relative"
           >
-            Gal Shinhorn
-          </motion.h1>
+            <div className="relative rounded-full p-[2px] bg-gradient-to-tr from-border via-background to-border shadow-xl">
+              <img 
+                src="/avatar.jpg" 
+                alt={language === 'he' ? "גל שינהורן - פורטרט" : "Gal Shinhorn - Portrait"} 
+                className="w-[110px] h-[110px] md:w-[140px] md:h-[140px] rounded-full object-cover border-4 border-background"
+              />
+            </div>
+          </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
