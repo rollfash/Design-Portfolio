@@ -1,4 +1,4 @@
-import { motion, useTransform, MotionValue, useReducedMotion } from "framer-motion";
+import { motion, useTransform, MotionValue, useReducedMotion, useMotionTemplate } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface SignatureProps {
@@ -9,33 +9,33 @@ interface SignatureProps {
 export function Signature({ progress, className }: SignatureProps) {
   const shouldReduceMotion = useReducedMotion();
   
-  // Map scroll progress (0 to 1) to path length (0 to 1)
-  // If reduced motion, always show full path
-  const pathLength = useTransform(progress, [0, 1], [0, 1]);
-  const opacity = useTransform(progress, [0, 0.1], [0, 1]);
+  // Map scroll progress (0 to 1) to reveal percentage (0 to 100)
+  const reveal = useTransform(progress, [0, 1], [0, 100]);
+  const opacity = useTransform(progress, [0, 0.05], [0, 1]);
 
-  const finalPathLength = shouldReduceMotion ? 1 : pathLength;
+  const finalReveal = shouldReduceMotion ? 100 : reveal;
   const finalOpacity = shouldReduceMotion ? 1 : opacity;
+  
+  // Create a dynamic mask gradient that moves from left to right
+  const maskImage = useMotionTemplate`linear-gradient(90deg, black ${finalReveal}%, transparent ${finalReveal}%)`;
 
   return (
-    <div className={cn("pointer-events-none select-none", className)}>
-      <svg
-        viewBox="0 0 500 300"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full"
+    <div className={cn("pointer-events-none select-none flex items-center justify-center", className)}>
+      <motion.div
+        style={{ 
+          maskImage: maskImage,
+          WebkitMaskImage: maskImage, // Safari support
+          opacity: finalOpacity
+        }}
+        className="w-full h-full flex items-center justify-center"
       >
-        <motion.path
-          d="M 150 200 C 140 180, 160 140, 180 130 C 200 120, 220 140, 210 160 C 200 180, 180 170, 190 150 C 200 130, 250 80, 280 70 C 290 65, 260 120, 250 140 C 240 160, 240 180, 260 170 C 280 160, 300 140, 320 130 C 330 125, 340 120, 350 130 C 360 140, 340 160, 330 170 M 200 180 C 220 180, 300 160, 350 150"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-primary drop-shadow-sm opacity-90"
-          style={{ pathLength: finalPathLength, opacity: finalOpacity }}
-          initial={{ pathLength: shouldReduceMotion ? 1 : 0, opacity: shouldReduceMotion ? 1 : 0 }}
+        <img 
+          src="/signature.png" 
+          alt="Signature" 
+          className="w-full h-full object-contain opacity-80 dark:invert dark:opacity-90"
         />
-      </svg>
+      </motion.div>
     </div>
   );
 }
+
