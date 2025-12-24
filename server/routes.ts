@@ -43,8 +43,13 @@ export async function registerRoutes(
       const { ObjectStorageService } = await import("./replit_integrations/object_storage");
       const objectStorageService = new ObjectStorageService();
       
-      // Get presigned URL for upload
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      // Extract file extension from original filename
+      const originalName = req.file.originalname;
+      const extMatch = originalName.match(/\.([^.]+)$/);
+      const extension = extMatch ? extMatch[1].toLowerCase() : undefined;
+      
+      // Get presigned URL for upload (includes extension for video detection)
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL(extension);
       const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
       
       // Upload file buffer directly to object storage
