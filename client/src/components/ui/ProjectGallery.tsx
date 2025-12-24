@@ -55,7 +55,7 @@ export function ProjectGallery({ projects }: ProjectGalleryProps) {
                     className="group cursor-pointer"
                     data-testid={`project-card-${project.id}`}
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden bg-secondary/20 mb-4">
+                    <div className="relative aspect-video overflow-hidden bg-secondary/20 mb-4">
                       <img 
                         src={project.image || '/placeholder.svg'} 
                         alt={localizedTitle}

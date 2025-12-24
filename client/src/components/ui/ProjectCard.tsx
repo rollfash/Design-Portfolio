@@ -24,7 +24,7 @@ export function ProjectCard({ id, title, category, image, year, className }: Pro
         whileHover={{ y: -5 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="relative overflow-hidden aspect-[4/5] bg-secondary/20 mb-4 group-hover:border-transparent">
+        <div className="relative overflow-hidden aspect-video bg-secondary/20 mb-4 group-hover:border-transparent">
           <motion.img 
             src={imageSrc} 
             alt={title}
