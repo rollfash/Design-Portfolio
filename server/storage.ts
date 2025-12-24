@@ -25,6 +25,6 @@ export interface IStorage {
   createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
 }
 
-// Use file storage to avoid database connection issues
-import { FileStorage } from "./file-storage";
-export const storage = new FileStorage();
+// Use PostgreSQL database for persistent storage across deployments
+import { DatabaseStorage } from "./database-storage";
+export const storage = new DatabaseStorage();
