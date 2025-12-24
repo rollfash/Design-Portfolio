@@ -8,16 +8,27 @@ import { useLanguage } from "@/lib/language-context";
 
 export function ProjectDetail() {
   const { id } = useParams();
-  const { projects } = useProjects();
+  const { projects, isLoading } = useProjects();
   const { t, language, direction } = useLanguage();
   const project = projects.find(p => p.id === id) || projects[0];
+
+  const ArrowNext = direction === 'rtl' ? ArrowLeft : ArrowRight;
+  const ArrowPrev = direction === 'rtl' ? ArrowRight : ArrowLeft;
+
+  // Show loading state while projects are being fetched
+  if (isLoading || !project) {
+    return (
+      <Layout>
+        <div className="container px-6 max-w-[1920px] pt-12 pb-24 flex flex-col items-center justify-center min-h-[50vh] mx-auto">
+          <p className="text-muted-foreground">{language === 'he' ? 'טוען...' : 'Loading...'}</p>
+        </div>
+      </Layout>
+    );
+  }
 
   // Safely handle optional arrays
   const gallery = project.gallery || [project.image];
   const services = (language === 'en' && project.servicesEn ? project.servicesEn : project.services) || [];
-
-  const ArrowNext = direction === 'rtl' ? ArrowLeft : ArrowRight;
-  const ArrowPrev = direction === 'rtl' ? ArrowRight : ArrowLeft;
 
   // Localized fields
   const title = language === 'en' && project.titleEn ? project.titleEn : project.title;
