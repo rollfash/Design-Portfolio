@@ -68,7 +68,7 @@ export function Admin() {
         const response = await uploadFile(file);
         console.log("Upload response:", response);
         if (response) {
-          setEditingProject({ ...editingProject, image: response.objectPath });
+          setEditingProject({ ...editingProject, image: response.url });
           toast({ title: "תמונה הועלתה", description: "התמונה הראשית הועלתה בהצלחה" });
         } else {
           toast({ title: "שגיאה", description: "העלאת התמונה נכשלה - אנא נסה שוב", variant: "destructive" });
@@ -100,7 +100,7 @@ export function Admin() {
             uploadedCount++;
             setEditingProject(prev => {
               if (!prev) return null;
-              const newGallery = [...(prev.gallery || []), response.objectPath];
+              const newGallery = [...(prev.gallery || []), response.url];
               return { ...prev, gallery: newGallery };
             });
           }
