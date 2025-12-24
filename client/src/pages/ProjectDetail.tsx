@@ -83,14 +83,16 @@ export function ProjectDetail() {
                const isVideo = media.startsWith("data:video") || videoExtensions.some(ext => media.toLowerCase().endsWith(ext));
                
                return (
-                  <div key={i} className={`relative group overflow-hidden bg-secondary/20 ${i === 0 ? "md:col-span-2 aspect-video" : "aspect-[4/5]"}`}>
+                  <div key={i} className={`relative group overflow-hidden bg-secondary/20 ${i === 0 ? "md:col-span-2 aspect-video" : "aspect-video"}`}>
                      {isVideo ? (
                         <video 
                            src={media} 
                            className="w-full h-full object-contain"
                            controls
+                           autoPlay
                            muted
                            loop
+                           playsInline
                         />
                      ) : (
                         <img 
