@@ -1,4 +1,5 @@
-import * as admin from 'firebase-admin';
+import { initializeApp, getApps, cert, type App } from 'firebase-admin/app';
+import { getFirestore, FieldValue, type Firestore } from 'firebase-admin/firestore';
 import { 
   type User, 
   type InsertUser,
@@ -9,11 +10,12 @@ import {
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 
-let db: admin.firestore.Firestore;
+let app: App;
+let db: Firestore;
 
 function getDb() {
   if (!db) {
-    if (!admin.apps.length) {
+    if (getApps().length === 0) {
       const projectId = process.env.FIREBASE_PROJECT_ID;
       const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
       const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
@@ -22,15 +24,15 @@ function getDb() {
         throw new Error('Firebase credentials not configured. Please set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY environment variables.');
       }
       
-      admin.initializeApp({
-        credential: admin.credential.cert({
+      app = initializeApp({
+        credential: cert({
           projectId,
           clientEmail,
           privateKey,
         })
       });
     }
-    db = admin.firestore();
+    db = getFirestore();
   }
   return db;
 }
@@ -55,7 +57,7 @@ export class FirebaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const docRef = await getDb().collection('users').add({
       ...insertUser,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: FieldValue.serverTimestamp()
     });
     const doc = await docRef.get();
     return { id: doc.id, ...doc.data() } as User;
@@ -86,7 +88,7 @@ export class FirebaseStorage implements IStorage {
   async createProject(insertProject: InsertProject): Promise<Project> {
     const docRef = await getDb().collection('projects').add({
       ...insertProject,
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: FieldValue.serverTimestamp()
     });
     const doc = await docRef.get();
     const data = doc.data();
@@ -134,7 +136,7 @@ export class FirebaseStorage implements IStorage {
   async createContactSubmission(insertSubmission: InsertContactSubmission): Promise<ContactSubmission> {
     const docRef = await getDb().collection('contactSubmissions').add({
       ...insertSubmission,
-      submittedAt: admin.firestore.FieldValue.serverTimestamp()
+      submittedAt: FieldValue.serverTimestamp()
     });
     const doc = await docRef.get();
     const data = doc.data();
