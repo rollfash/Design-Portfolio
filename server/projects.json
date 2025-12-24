@@ -1,29 +1,5 @@
 {
-  "projects": [
-    {
-      "id": "bac35cc6-7179-444c-9df2-211d8d865968",
-      "title": "Final Test Project",
-      "titleEn": null,
-      "category": "עיצוב מסחרי",
-      "categoryEn": null,
-      "image": "/uploads/final-test.jpg",
-      "date": null,
-      "year": "2024",
-      "location": null,
-      "locationEn": null,
-      "role": null,
-      "roleEn": null,
-      "description": "Testing file storage without database",
-      "descriptionEn": null,
-      "services": null,
-      "servicesEn": null,
-      "gallery": [
-        "/uploads/img1.jpg",
-        "/uploads/img2.jpg"
-      ],
-      "createdAt": "2025-12-24T07:53:32.758Z"
-    }
-  ],
+  "projects": [],
   "contacts": [],
   "users": []
 }
