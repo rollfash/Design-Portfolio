@@ -25,6 +25,6 @@ export interface IStorage {
   createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
 }
 
-// Use PostgreSQL database for persistent storage across deployments
-import { DatabaseStorage } from "./database-storage";
-export const storage = new DatabaseStorage();
+// Use Firebase Firestore for persistent storage across deployments
+import { FirebaseStorage } from "./firebase-storage";
+export const storage = new FirebaseStorage();
