@@ -28,7 +28,7 @@ export function ProjectCard({ id, title, category, image, year, className }: Pro
           <motion.img 
             src={imageSrc} 
             alt={title}
-            className="object-contain w-full h-full transition-transform duration-700 group-hover:scale-105"
+            className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
           />
           {/* Overlay Text - Always visible overlay for readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none transition-opacity duration-500" />
