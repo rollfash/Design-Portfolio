@@ -21,8 +21,8 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with Express
 - **API Pattern**: RESTful endpoints under `/api/*`
-- **Data Storage**: PostgreSQL database via Drizzle ORM (data persists across deployments)
-- **File Uploads**: Presigned URL flow using Google Cloud Storage via Replit's object storage integration
+- **Data Storage**: Local JSON file storage (`server/projects.json`) with atomic writes (data persists across deployments)
+- **File Uploads**: Direct multipart/form-data uploads to `/api/upload`, stored in `public/uploads` directory
 
 ### Data Models
 - **Users**: Basic authentication (id, username, password)
@@ -43,20 +43,13 @@ Preferred communication style: Simple, everyday language.
 
 ## External Dependencies
 
-### Database
-- **PostgreSQL**: Projects and contact submissions are stored in PostgreSQL database (persists across deployments)
-- **Drizzle ORM**: Type-safe database operations with schema defined in `shared/schema.ts`
-- **Drizzle Kit**: Schema migrations via `npm run db:push`
-
-### Cloud Services
-- **Google Cloud Storage**: Object storage for file uploads, accessed via Replit sidecar endpoint at `127.0.0.1:1106`
-
 ### Third-Party Libraries
-- **@uppy**: File upload UI with AWS S3-compatible presigned URL support
+- **multer**: Handles multipart/form-data file uploads
 - **framer-motion**: Animation library for scroll effects and transitions
 - **react-hook-form** + **zod**: Form handling with validation
 - **shadcn/ui** (Radix primitives): Comprehensive UI component library
+- **Resend**: Email service for contact form notifications
 
-### Environment Variables Required
-- `DATABASE_URL`: PostgreSQL connection string (required for data persistence)
-- `PUBLIC_OBJECT_SEARCH_PATHS`: Optional paths for public object storage access
+### Environment Variables
+No required environment variables for core functionality. Optional:
+- Email integration secrets (managed via Replit integrations)
