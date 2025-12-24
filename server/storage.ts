@@ -114,5 +114,6 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-// Use database storage for production persistence
-export const storage = new DatabaseStorage();
+// Use file storage to avoid database connection issues
+import { FileStorage } from "./file-storage";
+export const storage = new FileStorage();
