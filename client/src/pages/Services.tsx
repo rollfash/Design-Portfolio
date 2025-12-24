@@ -50,7 +50,7 @@ export function Services() {
               { icon: PenTool, title: t("services.process.design"), desc: t("services.process.design.desc") },
               { icon: HomeIcon, title: t("services.process.execute"), desc: t("services.process.execute.desc") }
             ].map((step, i) => (
-              <div key={i} className="relative z-10 bg-background md:bg-transparent text-center px-4 flex flex-col items-center">
+              <div key={i} className="relative z-10 bg-background md:bg-transparent text-center px-8 py-8 flex flex-col items-center">
                 <div className="w-24 h-24 mx-auto bg-secondary rounded-full flex items-center justify-center mb-6 text-primary">
                   <step.icon className="h-8 w-8" />
                 </div>
