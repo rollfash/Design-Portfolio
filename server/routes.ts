@@ -4,6 +4,10 @@ import { storage } from "./storage";
 import { insertProjectSchema, insertContactSubmissionSchema } from "@shared/schema";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { getResendClient } from "./resend-client";
+import multer from "multer";
+import path from "path";
+import { randomUUID } from "crypto";
+import fs from "fs";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -11,6 +15,75 @@ export async function registerRoutes(
 ): Promise<Server> {
   // Register object storage routes for file uploads
   registerObjectStorageRoutes(app);
+
+  // Configure multer for file uploads
+  const uploadsDir = path.join(process.cwd(), "public", "uploads");
+  
+  // Ensure uploads directory exists
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, uploadsDir);
+      },
+      filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        const uniqueName = `${randomUUID()}${ext}`;
+        cb(null, uniqueName);
+      },
+    }),
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB max file size
+    },
+    fileFilter: (req, file, cb) => {
+      // Only accept image files
+      if (!file.mimetype.startsWith("image/")) {
+        return cb(new Error("Only image files are allowed"));
+      }
+      cb(null, true);
+    },
+  });
+
+  // File upload endpoint
+  app.post("/api/upload", upload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      // Return the public URL for the uploaded file
+      const fileUrl = `/uploads/${req.file.filename}`;
+      
+      console.log(`File uploaded successfully: ${req.file.filename} (${req.file.size} bytes)`);
+      
+      res.json({
+        url: fileUrl,
+        filename: req.file.filename,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+      });
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      res.status(500).json({ 
+        error: error.message || "Failed to upload file",
+        details: error.toString()
+      });
+    }
+  });
+
+  // Error handler for multer
+  app.use((error: any, req: any, res: any, next: any) => {
+    if (error instanceof multer.MulterError) {
+      if (error.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({ error: "File is too large. Maximum size is 10MB." });
+      }
+      return res.status(400).json({ error: error.message });
+    }
+    next(error);
+  });
 
   // Projects API
   app.get("/api/projects", async (req, res) => {

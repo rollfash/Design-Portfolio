@@ -10,6 +10,9 @@ const httpServer = createServer(app);
 // Serve attached_assets for stock images and uploaded files
 app.use('/attached_assets', express.static(path.resolve(process.cwd(), 'attached_assets')));
 
+// Serve uploads directory for user-uploaded files
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'public', 'uploads')));
+
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
