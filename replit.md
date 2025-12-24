@@ -21,8 +21,8 @@ Preferred communication style: Simple, everyday language.
 ### Backend Architecture
 - **Runtime**: Node.js with Express
 - **API Pattern**: RESTful endpoints under `/api/*`
-- **Data Storage**: Local JSON file storage (`server/projects.json`) with atomic writes (data persists across deployments)
-- **File Uploads**: Direct multipart/form-data uploads to `/api/upload`, stored in `public/uploads` directory
+- **Data Storage**: Firebase Firestore for project data (persists across deployments)
+- **File Uploads**: Multipart/form-data uploads to `/api/upload`, stored in Replit Object Storage for persistence. Supports images and videos (up to 100MB).
 
 ### Data Models
 - **Users**: Basic authentication (id, username, password)

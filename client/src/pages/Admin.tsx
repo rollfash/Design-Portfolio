@@ -336,7 +336,7 @@ export function Admin() {
                             <div className="flex-1">
                               <input
                                 type="file"
-                                accept="image/*"
+                                accept="image/*,video/*"
                                 onChange={handleImageUpload}
                                 className="hidden"
                                 ref={fileInputRef}
@@ -364,7 +364,8 @@ export function Admin() {
                        <Label>גלריית תמונות ווידאו</Label>
                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           {editingProject.gallery && editingProject.gallery.map((item, index) => {
-                             const isVideo = item.startsWith("data:video");
+                             const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.mpeg', '.3gp', '.flv'];
+                             const isVideo = item.startsWith("data:video") || videoExtensions.some(ext => item.toLowerCase().endsWith(ext));
                              return (
                                <div key={index} className="relative aspect-square group rounded overflow-hidden border border-border bg-muted">
                                   {isVideo ? (

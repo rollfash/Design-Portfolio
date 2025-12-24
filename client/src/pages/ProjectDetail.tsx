@@ -79,7 +79,8 @@ export function ProjectDetail() {
           {/* Image Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-24">
             {gallery.map((media: string, i: number) => {
-               const isVideo = media.startsWith("data:video") || media.endsWith(".mp4") || media.endsWith(".webm");
+               const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.mpeg', '.3gp', '.flv'];
+               const isVideo = media.startsWith("data:video") || videoExtensions.some(ext => media.toLowerCase().endsWith(ext));
                
                return (
                   <div key={i} className={`relative group overflow-hidden bg-secondary/20 ${i === 0 ? "md:col-span-2 aspect-video" : "aspect-[4/5]"}`}>

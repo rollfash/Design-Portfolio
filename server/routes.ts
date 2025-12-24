@@ -5,9 +5,6 @@ import { insertProjectSchema, insertContactSubmissionSchema } from "@shared/sche
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { getResendClient } from "./resend-client";
 import multer from "multer";
-import path from "path";
-import { randomUUID } from "crypto";
-import fs from "fs";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -16,52 +13,58 @@ export async function registerRoutes(
   // Register object storage routes for file uploads
   registerObjectStorageRoutes(app);
 
-  // Configure multer for file uploads
-  const uploadsDir = path.join(process.cwd(), "public", "uploads");
-  
-  // Ensure uploads directory exists
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-
+  // Configure multer for file uploads (memory storage for object storage upload)
   const upload = multer({
-    storage: multer.diskStorage({
-      destination: (req, file, cb) => {
-        cb(null, uploadsDir);
-      },
-      filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        const uniqueName = `${randomUUID()}${ext}`;
-        cb(null, uniqueName);
-      },
-    }),
+    storage: multer.memoryStorage(),
     limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB max file size
+      fileSize: 100 * 1024 * 1024, // 100MB max file size for videos
     },
     fileFilter: (req, file, cb) => {
-      // Only accept image files
-      if (!file.mimetype.startsWith("image/")) {
-        return cb(new Error("Only image files are allowed"));
+      // Accept images and videos
+      const allowedTypes = [
+        'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
+        'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo',
+        'video/x-matroska', 'video/mpeg', 'video/3gpp', 'video/x-flv'
+      ];
+      if (!allowedTypes.includes(file.mimetype)) {
+        return cb(new Error("Only image and video files are allowed"));
       }
       cb(null, true);
     },
   });
 
-  // File upload endpoint
+  // File upload endpoint - uploads to object storage for persistence
   app.post("/api/upload", upload.single("file"), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
       }
 
-      // Return the public URL for the uploaded file
-      const fileUrl = `/uploads/${req.file.filename}`;
+      const { ObjectStorageService } = await import("./replit_integrations/object_storage");
+      const objectStorageService = new ObjectStorageService();
       
-      console.log(`File uploaded successfully: ${req.file.filename} (${req.file.size} bytes)`);
+      // Get presigned URL for upload
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+      
+      // Upload file buffer directly to object storage
+      const uploadResponse = await fetch(uploadURL, {
+        method: "PUT",
+        body: req.file.buffer,
+        headers: {
+          "Content-Type": req.file.mimetype,
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Failed to upload to object storage: ${uploadResponse.statusText}`);
+      }
+      
+      console.log(`File uploaded to object storage: ${objectPath} (${req.file.size} bytes)`);
       
       res.json({
-        url: fileUrl,
-        filename: req.file.filename,
+        url: objectPath,
+        filename: req.file.originalname,
         size: req.file.size,
         mimetype: req.file.mimetype,
       });
@@ -78,7 +81,7 @@ export async function registerRoutes(
   app.use((error: any, req: any, res: any, next: any) => {
     if (error instanceof multer.MulterError) {
       if (error.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).json({ error: "File is too large. Maximum size is 10MB." });
+        return res.status(400).json({ error: "File is too large. Maximum size is 100MB." });
       }
       return res.status(400).json({ error: error.message });
     }
