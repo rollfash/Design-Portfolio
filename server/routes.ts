@@ -93,6 +93,104 @@ export async function registerRoutes(
     next(error);
   });
 
+  // SEO endpoints
+  // robots.txt
+  app.get("/robots.txt", (req, res) => {
+    const host = req.get('host') || 'gal-shinhorn-portfolio.replit.app';
+    const protocol = req.protocol || 'https';
+    const baseURL = `${protocol}://${host}`;
+    
+    res.type('text/plain');
+    res.send(`# Robot Rules
+User-agent: *
+Allow: /
+Disallow: /admin
+
+Sitemap: ${baseURL}/sitemap.xml
+`);
+  });
+
+  // sitemap.xml
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      const host = req.get('host') || 'gal-shinhorn-portfolio.replit.app';
+      const protocol = req.protocol || 'https';
+      const baseURL = `${protocol}://${host}`;
+      
+      const projects = await storage.getAllProjects();
+      const now = new Date().toISOString().split('T')[0];
+      
+      let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>${baseURL}/</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="${baseURL}/" />
+    <xhtml:link rel="alternate" hreflang="en" href="${baseURL}/" />
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <lastmod>${now}</lastmod>
+  </url>
+  <url>
+    <loc>${baseURL}/portfolio</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="${baseURL}/portfolio" />
+    <xhtml:link rel="alternate" hreflang="en" href="${baseURL}/portfolio" />
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>${now}</lastmod>
+  </url>
+  <url>
+    <loc>${baseURL}/services</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="${baseURL}/services" />
+    <xhtml:link rel="alternate" hreflang="en" href="${baseURL}/services" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>${now}</lastmod>
+  </url>
+  <url>
+    <loc>${baseURL}/about</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="${baseURL}/about" />
+    <xhtml:link rel="alternate" hreflang="en" href="${baseURL}/about" />
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>${now}</lastmod>
+  </url>
+  <url>
+    <loc>${baseURL}/contact</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="${baseURL}/contact" />
+    <xhtml:link rel="alternate" hreflang="en" href="${baseURL}/contact" />
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>${now}</lastmod>
+  </url>
+`;
+      
+      // Add project pages
+      for (const project of projects) {
+        const projectDate = project.createdAt 
+          ? new Date(project.createdAt).toISOString().split('T')[0] 
+          : now;
+        sitemap += `  <url>
+    <loc>${baseURL}/project/${project.id}</loc>
+    <xhtml:link rel="alternate" hreflang="he" href="${baseURL}/project/${project.id}" />
+    <xhtml:link rel="alternate" hreflang="en" href="${baseURL}/project/${project.id}" />
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <lastmod>${projectDate}</lastmod>
+  </url>
+`;
+      }
+      
+      sitemap += `</urlset>`;
+      
+      res.type('application/xml');
+      res.send(sitemap);
+    } catch (error) {
+      console.error("Error generating sitemap:", error);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
   // Projects API
   app.get("/api/projects", async (req, res) => {
     try {

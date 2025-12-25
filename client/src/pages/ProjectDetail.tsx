@@ -6,6 +6,7 @@ import { ArrowRight, ArrowLeft } from "lucide-react";
 import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
 import { useSEO, generateProjectSchema, JSONLDScript } from "@/lib/seo";
+import { useEffect } from "react";
 
 export function ProjectDetail() {
   const { id } = useParams();
@@ -30,6 +31,30 @@ export function ProjectDetail() {
     image: project?.image,
     type: 'article'
   });
+
+  // Add JSON-LD structured data for project
+  useEffect(() => {
+    if (project) {
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'project-jsonld';
+      script.text = JSON.stringify(generateProjectSchema(project, language));
+      
+      const existingScript = document.getElementById('project-jsonld');
+      if (existingScript) {
+        existingScript.remove();
+      }
+      
+      document.head.appendChild(script);
+      
+      return () => {
+        const scriptToRemove = document.getElementById('project-jsonld');
+        if (scriptToRemove) {
+          scriptToRemove.remove();
+        }
+      };
+    }
+  }, [project, language]);
 
   // Show loading state while projects are being fetched
   if (isLoading || !project) {
