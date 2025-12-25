@@ -20,7 +20,6 @@ export function useSEO(meta: PageMeta) {
 
   useEffect(() => {
     const canonicalUrl = `${BASE_URL}${location}`;
-    const alternateUrl = `${BASE_URL}${location}`;
     const lang = language === 'he' ? 'he_IL' : 'en_US';
     const alternateLang = language === 'he' ? 'en_US' : 'he_IL';
 
@@ -41,31 +40,39 @@ export function useSEO(meta: PageMeta) {
       element.setAttribute(attribute, content);
     };
 
+    // Clean up existing hreflang and canonical links to prevent accumulation
+    const cleanupLinks = () => {
+      const existingCanonical = document.querySelectorAll('link[rel="canonical"]');
+      const existingHreflang = document.querySelectorAll('link[rel="alternate"][hreflang]');
+      existingCanonical.forEach(el => el.remove());
+      existingHreflang.forEach(el => el.remove());
+    };
+
     // Update or create link tag
-    const updateLink = (rel: string, href: string, hreflang?: string) => {
-      const selector = hreflang 
-        ? `link[rel="${rel}"][hreflang="${hreflang}"]`
-        : `link[rel="${rel}"]`;
-      let element = document.querySelector(selector) as HTMLLinkElement;
-      if (!element) {
-        element = document.createElement('link');
-        element.rel = rel;
-        if (hreflang) element.hreflang = hreflang;
-        document.head.appendChild(element);
-      }
+    const createLink = (rel: string, href: string, hreflang?: string) => {
+      const element = document.createElement('link');
+      element.rel = rel;
       element.href = href;
+      if (hreflang) {
+        element.hreflang = hreflang;
+      }
+      document.head.appendChild(element);
     };
 
     // Standard meta tags
     updateMeta('meta[name="description"]', meta.description);
     updateMeta('meta[name="robots"]', meta.noindex ? 'noindex, nofollow' : 'index, follow');
 
-    // Canonical URL
-    updateLink('canonical', canonicalUrl);
+    // Clean up old links and create new ones
+    cleanupLinks();
+    
+    // Canonical URL (always points to current page)
+    createLink('canonical', canonicalUrl);
 
-    // Hreflang tags
-    updateLink('alternate', canonicalUrl, language);
-    updateLink('alternate', alternateUrl, language === 'he' ? 'en' : 'he');
+    // Hreflang tags - for SPAs with client-side language switching (same URL for all languages),
+    // use ONLY x-default to indicate this URL serves multiple languages
+    // Google requires unique URLs per language for language-specific hreflang tags
+    createLink('alternate', canonicalUrl, 'x-default');
 
     // Open Graph
     updateMeta('meta[property="og:title"]', meta.title);

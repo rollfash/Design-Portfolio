@@ -1,7 +1,7 @@
 import { Layout } from "@/components/layout/Layout";
 import stockOwner from "@assets/stock_images/interior_designer_sk_b3da91c4.jpg";
 import { useLanguage } from "@/lib/language-context";
-import { useSEO } from "@/lib/seo";
+import { useSEO, generateAltText } from "@/lib/seo";
 
 export function About() {
   const { t, language } = useLanguage();
@@ -25,7 +25,11 @@ export function About() {
              {/* Order changed on mobile vs desktop to center the layout visually */}
              <div className="relative order-2 md:order-1 flex justify-center md:justify-end">
                 <div className="aspect-[3/4] bg-muted overflow-hidden max-w-sm w-full relative">
-                  <img src={stockOwner} alt="Gal Shinhorn" className="w-full h-full object-cover" />
+                  <img 
+                    src={stockOwner} 
+                    alt={generateAltText('hero', 'Gal Shinhorn', undefined, language)}
+                    loading="lazy"
+                    className="w-full h-full object-cover" />
                   <div className="absolute inset-0 border border-primary/20 m-4 pointer-events-none"></div>
                 </div>
              </div>
