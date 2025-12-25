@@ -72,6 +72,7 @@ export function Navbar() {
             <button
               className="absolute top-6 right-6 z-[101] p-2"
               onClick={() => setIsMobileMenuOpen(false)}
+              aria-label={language === 'he' ? 'סגור תפריט' : 'Close menu'}
             >
               <X className="h-6 w-6" />
             </button>
@@ -115,6 +116,7 @@ export function Navbar() {
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent",
           isScrolled ? "bg-background/80 backdrop-blur-md border-border py-4" : "bg-transparent py-6"
         )}
+        aria-label={language === 'he' ? 'ניווט ראשי' : 'Main navigation'}
       >
         <div className="container mx-auto px-6 max-w-[1920px] flex items-center justify-between">
           <Link href="/" className="flex flex-col">
@@ -155,6 +157,7 @@ export function Navbar() {
               size="icon"
               onClick={toggleTheme}
               className="rounded-full hover:bg-muted"
+              aria-label={theme === 'light' ? t("nav.mode.dark") : t("nav.mode.light")}
             >
               {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </Button>
@@ -164,6 +167,8 @@ export function Navbar() {
           <button
             className="md:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={language === 'he' ? 'פתח תפריט' : 'Open menu'}
+            aria-expanded={isMobileMenuOpen}
           >
             <Menu className="h-6 w-6" />
           </button>

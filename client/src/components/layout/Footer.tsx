@@ -9,10 +9,10 @@ export function Footer() {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-secondary/30 pt-20 pb-10 border-t border-border">
+    <footer className="bg-secondary/30 pt-20 pb-10 border-t border-border" aria-label={t("footer.contact")}>
       <div className="container mx-auto px-6 max-w-[1920px] flex flex-col items-center text-center">
         
-        <h3 className="text-3xl font-bold mb-4 text-primary">Gal Shinhorn</h3>
+        <p className="text-3xl font-bold mb-4 text-primary">Gal Shinhorn</p>
         <p className="text-muted-foreground max-w-sm mb-12">
           {t("footer.tagline")}
         </p>
@@ -40,14 +40,14 @@ export function Footer() {
           <div className="flex flex-col items-center">
              <h4 className="font-semibold mb-6 text-sm tracking-wider uppercase text-primary">{t("footer.social")}</h4>
              <div className="flex gap-4">
-              <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="p-3 bg-background rounded-full hover:bg-[#25D366] hover:text-white transition-all duration-300 shadow-sm" data-testid="link-whatsapp">
-                <MessageCircle className="h-5 w-5" />
+              <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="p-3 bg-background rounded-full hover:bg-[#25D366] hover:text-white transition-all duration-300 shadow-sm" data-testid="link-whatsapp" aria-label="WhatsApp">
+                <MessageCircle className="h-5 w-5" aria-hidden="true" />
               </a>
-              <a href="#" className="p-3 bg-background rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm">
-                <Instagram className="h-5 w-5" />
+              <a href="#" className="p-3 bg-background rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm" aria-label="Instagram">
+                <Instagram className="h-5 w-5" aria-hidden="true" />
               </a>
-              <a href="#" className="p-3 bg-background rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm">
-                <Linkedin className="h-5 w-5" />
+              <a href="#" className="p-3 bg-background rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm" aria-label="LinkedIn">
+                <Linkedin className="h-5 w-5" aria-hidden="true" />
               </a>
             </div>
           </div>
