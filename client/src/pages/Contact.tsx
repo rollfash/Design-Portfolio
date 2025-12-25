@@ -13,6 +13,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/lib/language-context";
 import { MessageCircle } from "lucide-react";
+import { useSEO } from "@/lib/seo";
 
 const WHATSAPP_LINK = "https://wa.me/972544545646";
 
@@ -27,7 +28,17 @@ const formSchema = z.object({
 export function Contact() {
   const { toast } = useToast();
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  useSEO({
+    title: language === 'he'
+      ? 'צור קשר | גל שינהורן - מעצב הפקה וארט דיירקטור'
+      : 'Contact | Gal Shinhorn - Production Designer & Art Director',
+    description: language === 'he'
+      ? 'צור קשר עם גל שינהורן לייעוץ בעיצוב סטים, תערוכות וחללי חוויה. אימייל: galart1@gmail.com | טלפון: +972544545646'
+      : 'Contact Gal Shinhorn for consultation on set design, exhibitions and experiential spaces. Email: galart1@gmail.com | Phone: +972544545646',
+    type: 'website'
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

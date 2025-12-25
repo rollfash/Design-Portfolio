@@ -1,9 +1,21 @@
 import { Layout } from "@/components/layout/Layout";
 import stockOwner from "@assets/stock_images/interior_designer_sk_b3da91c4.jpg";
 import { useLanguage } from "@/lib/language-context";
+import { useSEO } from "@/lib/seo";
 
 export function About() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  useSEO({
+    title: language === 'he'
+      ? 'אודות | גל שינהורן - מעצב הפקה וארט דיירקטור'
+      : 'About | Gal Shinhorn - Production Designer & Art Director',
+    description: language === 'he'
+      ? 'למד עלי - גל שינהורן, מעצב הפקה וארט דיירקטור עם גישה מינימליסטית ואורגנית. ניסיון של למעלה מ-20 שנה בעיצוב סטים, תערוכות וחללי חוויה.'
+      : 'Learn about Gal Shinhorn - Production Designer & Art Director with a minimalist and organic approach. Over 20 years of experience in set design, exhibitions and experiential spaces.',
+    image: stockOwner,
+    type: 'profile'
+  });
 
   return (
     <Layout>

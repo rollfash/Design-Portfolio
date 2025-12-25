@@ -4,11 +4,22 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
+import { useSEO } from "@/lib/seo";
 
 export function Portfolio() {
   const { projects } = useProjects();
   const { t, language } = useLanguage();
   const [activeFilter, setActiveFilter] = useState("All");
+
+  useSEO({
+    title: language === 'he'
+      ? 'עבודות נבחרות | גל שינהורן - תיק עבודות'
+      : 'Portfolio | Gal Shinhorn - Selected Work',
+    description: language === 'he'
+      ? 'אוסף עבודות נבחרות בעיצוב סטים, תערוכות וחללי חוויה. הבוגדים, מה קורה פה, תערוכות ופרויקטים מסחריים.'
+      : 'Selected works in set design, exhibitions and experiential spaces. The Traitors, game shows, exhibitions and commercial projects.',
+    type: 'website'
+  });
 
   const FILTERS = [
     { id: "All", label: t("filter.all"), originalId: "All" },

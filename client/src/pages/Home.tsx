@@ -9,12 +9,24 @@ import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
 import { getMostRecentProjects } from "@/lib/project-utils";
 import { useMemo } from "react";
+import { useSEO } from "@/lib/seo";
 
 export function Home() {
   const { projects } = useProjects();
   const { t, language, direction } = useLanguage();
   const featuredProjects = useMemo(() => getMostRecentProjects(projects, 6), [projects]);
   const ArrowIcon = direction === 'rtl' ? ArrowLeft : ArrowRight;
+
+  useSEO({
+    title: language === 'he' 
+      ? 'גל שינהורן | מעצב הפקה וארט דיירקטור | עיצוב סטים ותערוכות'
+      : 'Gal Shinhorn | Production Designer & Art Director | Set Design',
+    description: language === 'he'
+      ? 'גל שינהורן - מעצב הפקה וארט דיירקטור עם ניסיון של למעלה מ-20 שנה. מתמחה בעיצוב סטים לטלוויזיה, תערוכות וחללי חוויה. הבוגדים, מה קורה פה ועוד.'
+      : 'Gal Shinhorn - Production Designer & Art Director with over 20 years of experience. Specializing in TV set design, exhibitions and experiential spaces.',
+    image: '/og-image.png',
+    type: 'website'
+  });
 
   return (
     <Layout>

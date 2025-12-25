@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft } from "lucide-react"; 
 import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
+import { useSEO, generateProjectSchema, JSONLDScript } from "@/lib/seo";
 
 export function ProjectDetail() {
   const { id } = useParams();
@@ -14,6 +15,21 @@ export function ProjectDetail() {
 
   const ArrowNext = direction === 'rtl' ? ArrowLeft : ArrowRight;
   const ArrowPrev = direction === 'rtl' ? ArrowRight : ArrowLeft;
+
+  // Localized fields for SEO
+  const seoTitle = project && (language === 'en' && project.titleEn ? project.titleEn : project.title);
+  const seoDescription = project && (language === 'en' && project.descriptionEn ? project.descriptionEn : project.description);
+  
+  useSEO({
+    title: seoTitle 
+      ? `${seoTitle} | ${language === 'he' ? 'גל שינהורן' : 'Gal Shinhorn'}`
+      : language === 'he' ? 'פרויקט | גל שינהורן' : 'Project | Gal Shinhorn',
+    description: seoDescription || (language === 'he' 
+      ? 'פרויקט עיצוב מאת גל שינהורן - מעצב הפקה וארט דיירקטור'
+      : 'Design project by Gal Shinhorn - Production Designer & Art Director'),
+    image: project?.image,
+    type: 'article'
+  });
 
   // Show loading state while projects are being fetched
   if (isLoading || !project) {

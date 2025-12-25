@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Plus, Edit2, Save, X, Upload, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUpload } from "@/hooks/use-upload";
+import { useSEO } from "@/lib/seo";
 
 export function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -23,6 +24,12 @@ export function Admin() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const { uploadFile } = useUpload();
+
+  useSEO({
+    title: 'Admin Panel | Gal Shinhorn',
+    description: 'Admin panel for managing projects',
+    noindex: true
+  });
 
   // Simple mock login
   const handleLogin = (e: React.FormEvent) => {
