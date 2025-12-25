@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft } from "lucide-react"; 
 import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
-import { useSEO, generateProjectSchema, JSONLDScript } from "@/lib/seo";
+import { useSEO, generateProjectSchema, JSONLDScript, generateAltText } from "@/lib/seo";
 import { useEffect } from "react";
 
 export function ProjectDetail() {
@@ -138,7 +138,8 @@ export function ProjectDetail() {
                      ) : (
                         <img 
                            src={media} 
-                           alt={`Project detail ${i+1}`} 
+                           alt={generateAltText('project-detail', title, i, language)}
+                           loading={i === 0 ? "eager" : "lazy"}
                            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
                         />
                      )}

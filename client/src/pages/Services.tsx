@@ -3,10 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Check, Lightbulb, PenTool, Home as HomeIcon, ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/language-context";
+import { useSEO } from "@/lib/seo";
 
 export function Services() {
-  const { t, direction } = useLanguage();
+  const { t, direction, language } = useLanguage();
   const ArrowIcon = direction === 'rtl' ? ArrowLeft : ArrowRight;
+
+  useSEO({
+    title: language === 'he'
+      ? 'שירותים | גל שינהורן - עיצוב סטים ותערוכות'
+      : 'Services | Gal Shinhorn - Set Design & Exhibitions',
+    description: language === 'he'
+      ? 'שירותי עיצוב מקצועיים: עיצוב סטים, תערוכות, חללי חוויה וסטיילינג. פתרונות מקצועיים מהקונספט ועד הביצוע.'
+      : 'Professional design services: set design, exhibitions, experiential spaces and styling. Professional solutions from concept to execution.',
+    type: 'website'
+  });
 
   const services = [
     {

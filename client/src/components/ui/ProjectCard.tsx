@@ -1,6 +1,8 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowUpLeft } from "lucide-react"; // RTL Arrow
+import { useLanguage } from "@/lib/language-context";
+import { generateAltText } from "@/lib/seo";
 
 interface ProjectCardProps {
   id: string;
@@ -12,6 +14,8 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ id, title, category, image, year, className }: ProjectCardProps) {
+  const { language } = useLanguage();
+  
   // Default placeholder image for empty/missing images
   const imageSrc = image && image.trim() !== '' 
     ? image 
@@ -27,7 +31,8 @@ export function ProjectCard({ id, title, category, image, year, className }: Pro
         <div className="relative overflow-hidden aspect-video bg-secondary/20 mb-4 group-hover:border-transparent">
           <motion.img 
             src={imageSrc} 
-            alt={title}
+            alt={generateAltText('project-card', title, undefined, language)}
+            loading="lazy"
             className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
           />
           {/* Overlay Text - Always visible overlay for readability */}
