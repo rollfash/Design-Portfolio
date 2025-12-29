@@ -1,4 +1,4 @@
-import { Instagram, Linkedin, MessageCircle } from "lucide-react";
+import { Instagram, Facebook, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/language-context";
 
@@ -43,11 +43,11 @@ export function Footer() {
               <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="p-3 bg-background rounded-full hover:bg-[#25D366] hover:text-white transition-all duration-300 shadow-sm" data-testid="link-whatsapp" aria-label="WhatsApp">
                 <MessageCircle className="h-5 w-5" aria-hidden="true" />
               </a>
-              <a href="#" className="p-3 bg-background rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm" aria-label="Instagram">
+              <a href="https://www.instagram.com/gs_design.studio/" target="_blank" rel="noopener noreferrer" className="p-3 bg-background rounded-full hover:bg-[#E4405F] hover:text-white transition-all duration-300 shadow-sm" data-testid="link-instagram" aria-label="Instagram">
                 <Instagram className="h-5 w-5" aria-hidden="true" />
               </a>
-              <a href="#" className="p-3 bg-background rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-sm" aria-label="LinkedIn">
-                <Linkedin className="h-5 w-5" aria-hidden="true" />
+              <a href="https://www.facebook.com/search/top?q=gs_design.studio" target="_blank" rel="noopener noreferrer" className="p-3 bg-background rounded-full hover:bg-[#1877F2] hover:text-white transition-all duration-300 shadow-sm" data-testid="link-facebook" aria-label="Facebook">
+                <Facebook className="h-5 w-5" aria-hidden="true" />
               </a>
             </div>
           </div>
