@@ -101,6 +101,12 @@ function SortableGalleryItem({ id, item, index, onRemove }: SortableGalleryItemP
   );
 }
 
+// Helper to generate stable gallery item IDs
+interface GalleryItemWithId {
+  id: string;
+  url: string;
+}
+
 export function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
@@ -113,6 +119,25 @@ export function Admin() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const { uploadFile } = useUpload();
+  
+  // Stable ID mapping for gallery items (persists across renders)
+  const galleryIdMapRef = useRef<Map<string, string>>(new Map());
+  
+  // Helper to get or create stable ID for a URL
+  const getStableId = (url: string): string => {
+    if (!galleryIdMapRef.current.has(url)) {
+      galleryIdMapRef.current.set(url, `gallery-${Date.now()}-${galleryIdMapRef.current.size}-${Math.random().toString(36).substring(7)}`);
+    }
+    return galleryIdMapRef.current.get(url)!;
+  };
+  
+  // Derive galleryItems from editingProject.gallery with stable IDs
+  const galleryItems: GalleryItemWithId[] = editingProject?.gallery
+    ? editingProject.gallery.map(url => ({
+        id: getStableId(url),
+        url
+      }))
+    : [];
 
   useSEO({
     title: 'Admin Panel | Gal Shinhorn',
@@ -149,6 +174,7 @@ export function Admin() {
       }
 
       try {
+        // editingProject.gallery is the single source of truth
         if (isAddingNew) {
           // Remove id and createdAt for new projects - server generates these
           const { id, createdAt, ...projectData } = editingProject;
@@ -168,6 +194,7 @@ export function Admin() {
           });
         }
         setEditingProject(null);
+        galleryIdMapRef.current.clear();
         setIsAddingNew(false);
       } catch (error: any) {
         console.error("Error saving project:", error);
@@ -221,11 +248,11 @@ export function Admin() {
           console.log("Gallery upload response:", response);
           if (response) {
             uploadedCount++;
-            setEditingProject(prev => {
-              if (!prev) return null;
-              const newGallery = [...(prev.gallery || []), response.url];
-              return { ...prev, gallery: newGallery };
-            });
+            // Update editingProject.gallery (single source of truth)
+            setEditingProject(prev => prev ? {
+              ...prev,
+              gallery: [...(prev.gallery || []), response.url]
+            } : null);
           }
         }
         if (uploadedCount > 0) {
@@ -246,11 +273,14 @@ export function Admin() {
     }
   };
 
-  const removeGalleryItem = (index: number) => {
-     if (editingProject && editingProject.gallery) {
-        const newGallery = [...editingProject.gallery];
-        newGallery.splice(index, 1);
-        setEditingProject({ ...editingProject, gallery: newGallery });
+  const removeGalleryItem = (id: string) => {
+     // Find the URL from the stable ID
+     const itemToRemove = galleryItems.find(item => item.id === id);
+     if (itemToRemove && editingProject) {
+       setEditingProject(prev => prev ? {
+         ...prev,
+         gallery: prev.gallery?.filter(url => url !== itemToRemove.url) || null
+       } : null);
      }
   };
 
@@ -264,20 +294,26 @@ export function Admin() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (editingProject?.gallery && over && active.id !== over.id) {
-      const oldIndex = parseInt(active.id as string, 10);
-      const newIndex = parseInt(over.id as string, 10);
-      const newGallery = arrayMove(editingProject.gallery, oldIndex, newIndex);
-      setEditingProject({ ...editingProject, gallery: newGallery });
+    if (galleryItems.length > 0 && over && active.id !== over.id && editingProject) {
+      const oldIndex = galleryItems.findIndex(item => item.id === active.id);
+      const newIndex = galleryItems.findIndex(item => item.id === over.id);
+      if (oldIndex !== -1 && newIndex !== -1 && editingProject.gallery) {
+        const newGallery = arrayMove(editingProject.gallery, oldIndex, newIndex);
+        setEditingProject({ ...editingProject, gallery: newGallery });
+      }
     }
   };
 
   const startEdit = (project: Project) => {
+    // Clear ID map for fresh editing session
+    galleryIdMapRef.current.clear();
     setEditingProject({ ...project });
     setIsAddingNew(false);
   };
 
   const startAdd = () => {
+    // Clear ID map for fresh editing session
+    galleryIdMapRef.current.clear();
     setEditingProject({
       id: `new-project-${Date.now()}`,
       title: "",
@@ -528,17 +564,17 @@ export function Admin() {
                          onDragEnd={handleDragEnd}
                        >
                          <SortableContext 
-                           items={editingProject.gallery?.map((_, i) => i.toString()) || []}
+                           items={galleryItems.map(item => item.id)}
                            strategy={verticalListSortingStrategy}
                          >
                            <div className="space-y-2">
-                              {editingProject.gallery && editingProject.gallery.map((item, index) => (
+                              {galleryItems.map((item, index) => (
                                 <SortableGalleryItem
-                                  key={index}
-                                  id={index.toString()}
-                                  item={item}
+                                  key={item.id}
+                                  id={item.id}
+                                  item={item.url}
                                   index={index}
-                                  onRemove={() => removeGalleryItem(index)}
+                                  onRemove={() => removeGalleryItem(item.id)}
                                 />
                               ))}
                            </div>
