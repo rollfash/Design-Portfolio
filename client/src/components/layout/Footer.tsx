@@ -46,7 +46,7 @@ export function Footer() {
               <a href="https://www.instagram.com/gs_design.studio/" target="_blank" rel="noopener noreferrer" className="p-3 bg-background rounded-full hover:bg-[#E4405F] hover:text-white transition-all duration-300 shadow-sm" data-testid="link-instagram" aria-label="Instagram">
                 <Instagram className="h-5 w-5" aria-hidden="true" />
               </a>
-              <a href="https://www.facebook.com/search/top?q=gs_design.studio" target="_blank" rel="noopener noreferrer" className="p-3 bg-background rounded-full hover:bg-[#1877F2] hover:text-white transition-all duration-300 shadow-sm" data-testid="link-facebook" aria-label="Facebook">
+              <a href="https://www.facebook.com/profile.php?id=100065451461120" target="_blank" rel="noopener noreferrer" className="p-3 bg-background rounded-full hover:bg-[#1877F2] hover:text-white transition-all duration-300 shadow-sm" data-testid="link-facebook" aria-label="Facebook">
                 <Facebook className="h-5 w-5" aria-hidden="true" />
               </a>
             </div>
