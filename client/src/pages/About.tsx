@@ -1,18 +1,9 @@
 import { Layout } from "@/components/layout/Layout";
 import { useLanguage } from "@/lib/language-context";
 import { useSEO, generateAltText } from "@/lib/seo";
-import { useProjects } from "@/lib/project-context";
-import { useMemo } from "react";
 
 export function About() {
   const { t, language } = useLanguage();
-  const { projects } = useProjects();
-
-  const randomProjectImage = useMemo(() => {
-    if (projects.length === 0) return "/avatar.jpg";
-    const randomIndex = Math.floor(Math.random() * projects.length);
-    return projects[randomIndex]?.image || "/avatar.jpg";
-  }, [projects]);
 
   useSEO({
     title: language === 'he'
@@ -21,7 +12,7 @@ export function About() {
     description: language === 'he'
       ? 'למד עלי - גל שינהורן, מעצב הפקה וארט דיירקטור עם גישה מינימליסטית ואורגנית. ניסיון של למעלה מ-20 שנה בעיצוב סטים, תערוכות וחללי חוויה.'
       : 'Learn about Gal Shinhorn - Production Designer & Art Director with a minimalist and organic approach. Over 20 years of experience in set design, exhibitions and experiential spaces.',
-    image: randomProjectImage,
+    image: '/about-image.jpg',
     type: 'profile'
   });
 
@@ -34,7 +25,7 @@ export function About() {
              <div className="relative order-2 md:order-1 flex justify-center md:justify-end">
                 <div className="aspect-[3/4] bg-muted overflow-hidden max-w-sm w-full relative">
                   <img 
-                    src={randomProjectImage} 
+                    src="/about-image.jpg" 
                     alt={generateAltText('hero', 'Gal Shinhorn', undefined, language)}
                     loading="lazy"
                     className="w-full h-full object-cover"
@@ -46,16 +37,9 @@ export function About() {
              </div>
 
              <div className="order-1 md:order-2 text-center md:text-start">
-               <div className="flex justify-center md:justify-start mb-8">
-                 <img 
-                   src="/avatar.jpg" 
-                   alt="Gal Shinhorn"
-                   className="w-24 h-24 rounded-full object-cover border-2 border-primary/20"
-                   onContextMenu={(e) => e.preventDefault()}
-                   onDragStart={(e) => e.preventDefault()}
-                   draggable={false}
-                 />
-               </div>
+               <h1 className="text-4xl md:text-5xl font-bold mb-8 text-primary">
+                 {language === 'he' ? 'אודות הסטודיו' : 'About the Studio'}
+               </h1>
                <div className="prose prose-lg text-muted-foreground mb-12 mx-auto md:mx-0">
                  <p className="mb-6">{t("about.p1")}</p>
                  <p className="mb-6">{t("about.p2")}</p>
