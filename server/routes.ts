@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertProjectSchema, insertContactSubmissionSchema } from "@shared/schema";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { getResendClient } from "./resend-client";
+import { translateText, translateFields, isTranslationAvailable } from "./translate";
 import multer from "multer";
 
 export async function registerRoutes(
@@ -189,6 +190,40 @@ Sitemap: ${baseURL}/sitemap.xml
       console.error("Error generating sitemap:", error);
       res.status(500).send("Error generating sitemap");
     }
+  });
+
+  // Translation API
+  app.post("/api/translate", async (req, res) => {
+    try {
+      if (!isTranslationAvailable()) {
+        return res.status(503).json({ 
+          error: "Translation service not configured",
+          available: false 
+        });
+      }
+
+      const { text, from = "Hebrew", to = "English" } = req.body;
+      
+      if (!text || text.trim() === "") {
+        return res.status(400).json({ error: "Text is required" });
+      }
+
+      const translated = await translateText(text, from, to);
+      res.json({ 
+        original: text,
+        translated,
+        from,
+        to 
+      });
+    } catch (error: any) {
+      console.error("Translation error:", error);
+      res.status(500).json({ error: error.message || "Translation failed" });
+    }
+  });
+
+  // Check translation availability
+  app.get("/api/translate/status", (req, res) => {
+    res.json({ available: isTranslationAvailable() });
   });
 
   // Projects API

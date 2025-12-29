@@ -7,10 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Plus, Edit2, Save, X, Upload, Loader2, GripVertical } from "lucide-react";
+import { Trash2, Plus, Edit2, Save, X, Upload, Loader2, GripVertical, Languages } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUpload } from "@/hooks/use-upload";
 import { useSEO } from "@/lib/seo";
+import { useTranslation } from "@/hooks/use-translation";
+import { Switch } from "@/components/ui/switch";
 import {
   DndContext,
   closestCenter,
@@ -116,9 +118,12 @@ export function Admin() {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [isUploadingMain, setIsUploadingMain] = useState(false);
   const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const [autoTranslate, setAutoTranslate] = useState(true);
+  const [isTranslating, setIsTranslating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const { uploadFile } = useUpload();
+  const { isAvailable: translationAvailable, translateText } = useTranslation();
   
   // Stable ID mapping for gallery items (persists across renders)
   const galleryIdMapRef = useRef<Map<string, string>>(new Map());
@@ -174,22 +179,53 @@ export function Admin() {
       }
 
       try {
+        let projectToSave = { ...editingProject };
+
+        // Auto-translate missing English fields if enabled
+        if (autoTranslate && translationAvailable) {
+          setIsTranslating(true);
+          const fieldsToTranslate: Array<{ he: keyof Project, en: keyof Project }> = [
+            { he: 'title', en: 'titleEn' },
+            { he: 'description', en: 'descriptionEn' },
+            { he: 'role', en: 'roleEn' },
+            { he: 'location', en: 'locationEn' },
+            { he: 'category', en: 'categoryEn' },
+          ];
+
+          for (const { he, en } of fieldsToTranslate) {
+            const heValue = projectToSave[he];
+            const enValue = projectToSave[en];
+            
+            // Only translate if Hebrew exists and English is missing
+            if (heValue && typeof heValue === 'string' && heValue.trim() && (!enValue || (typeof enValue === 'string' && !enValue.trim()))) {
+              try {
+                const translated = await translateText(heValue);
+                projectToSave = { ...projectToSave, [en]: translated };
+              } catch (error) {
+                console.error(`Failed to translate ${he}:`, error);
+                // Continue with other fields even if one fails
+              }
+            }
+          }
+          setIsTranslating(false);
+        }
+
         // editingProject.gallery is the single source of truth
         if (isAddingNew) {
           // Remove id and createdAt for new projects - server generates these
-          const { id, createdAt, ...projectData } = editingProject;
+          const { id, createdAt, ...projectData } = projectToSave;
           await addProject(projectData);
           toast({ 
             title: "פרויקט נוסף בהצלחה", 
-            description: `"${editingProject.title}" נוסף למערכת${editingProject.showOnHome ? ' ומופיע בעמוד הבית' : ''}`,
+            description: `"${projectToSave.title}" נוסף למערכת${projectToSave.showOnHome ? ' ומופיע בעמוד הבית' : ''}${autoTranslate && translationAvailable ? ' (תורגם לאנגלית)' : ''}`,
             duration: 4000
           });
         } else {
-          const { id, createdAt, ...projectData } = editingProject;
-          await updateProject(editingProject.id, projectData);
+          const { id, createdAt, ...projectData } = projectToSave;
+          await updateProject(projectToSave.id, projectData);
           toast({ 
             title: "שינויים נשמרו בהצלחה", 
-            description: `הפרויקט "${editingProject.title}" עודכן${editingProject.showOnHome ? ' ומופיע בעמוד הבית' : ''}`,
+            description: `הפרויקט "${projectToSave.title}" עודכן${projectToSave.showOnHome ? ' ומופיע בעמוד הבית' : ''}${autoTranslate && translationAvailable ? ' (תורגם לאנגלית)' : ''}`,
             duration: 4000
           });
         }
@@ -205,6 +241,7 @@ export function Admin() {
           variant: "destructive",
           duration: 5000
         });
+        setIsTranslating(false);
       }
     }
   };
@@ -607,9 +644,44 @@ export function Admin() {
                        </div>
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-4 border-t border-border mt-4">
+                    {!translationAvailable && (
+                      <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm text-yellow-800 dark:text-yellow-200">
+                        <p className="font-medium">תרגום אוטומטי לא זמין</p>
+                        <p className="text-xs mt-1">שירות התרגום אינו מוגדר. שדות אנגלית יצטרכו להיות מלאים ידנית.</p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-4 border-t border-border mt-4 bg-muted/30 p-4 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <Languages className="h-5 w-5 text-primary" />
+                        <div>
+                          <Label htmlFor="autoTranslate" className="cursor-pointer font-medium">
+                            תרגום אוטומטי לאנגלית (Auto-translate to English)
+                          </Label>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {translationAvailable 
+                              ? "מתרגם אוטומטית שדות עברית לאנגלית בשמירה"
+                              : "שירות תרגום לא זמין"}
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        id="autoTranslate"
+                        checked={autoTranslate && translationAvailable}
+                        onCheckedChange={setAutoTranslate}
+                        disabled={!translationAvailable}
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-4">
                       <Button type="button" variant="outline" onClick={() => setEditingProject(null)}>ביטול</Button>
-                      <Button type="submit" className="gap-2"><Save className="h-4 w-4" /> שמור שינויים</Button>
+                      <Button type="submit" className="gap-2" disabled={isTranslating}>
+                        {isTranslating ? (
+                          <><Loader2 className="h-4 w-4 animate-spin" /> מתרגם ושומר...</>
+                        ) : (
+                          <><Save className="h-4 w-4" /> שמור שינויים</>
+                        )}
+                      </Button>
                     </div>
                   </form>
                 </CardContent>

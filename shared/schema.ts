@@ -64,3 +64,6 @@ export const insertContactSubmissionSchema = createInsertSchema(contactSubmissio
 
 export type InsertContactSubmission = z.infer<typeof insertContactSubmissionSchema>;
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
+
+// Export chat models
+export * from "./models/chat";

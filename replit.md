@@ -33,13 +33,15 @@ Preferred communication style: Simple, everyday language.
 
 1. **Bilingual Support**: All content fields have English variants (e.g., `title`/`titleEn`). Language context determines which to display with RTL/LTR direction switching.
 
-2. **File Uploads**: Files upload directly to `/api/upload` endpoint using multipart/form-data with multer, stored in `public/uploads` directory. This replaced the previous presigned URL flow to eliminate external DNS dependencies.
+2. **Auto-Translation**: Integrated OpenAI translation via Replit AI Integrations. When saving projects in the admin panel, missing English fields are automatically translated from Hebrew if the auto-translate toggle is enabled (default: ON). Uses `gpt-4.1-mini` model for cost-effective, high-quality translations. Translation endpoint: `/api/translate`.
 
-3. **Firebase Firestore Storage**: Uses Firebase Firestore (external database) for all project data storage via the `FirebaseStorage` class in `server/firebase-storage.ts`. This ensures data persists across republishes and deployments. Firebase credentials are stored as environment secrets (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY).
+3. **File Uploads**: Files upload directly to `/api/upload` endpoint using multipart/form-data with multer, stored in Replit Object Storage for persistence. Supports images and videos (up to 100MB).
 
-4. **Shared Schema**: Schema types live in `/shared/schema.ts` allowing type sharing between frontend and backend via Drizzle-Zod integration for validation.
+4. **Firebase Firestore Storage**: Uses Firebase Firestore (external database) for all project data storage via the `FirebaseStorage` class in `server/firebase-storage.ts`. This ensures data persists across republishes and deployments. Firebase credentials are stored as environment secrets (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY).
 
-5. **Server-Side Rendering Not Used**: This is a client-side React SPA with Express serving static files in production and Vite dev server in development.
+5. **Shared Schema**: Schema types live in `/shared/schema.ts` allowing type sharing between frontend and backend via Drizzle-Zod integration for validation.
+
+6. **Server-Side Rendering Not Used**: This is a client-side React SPA with Express serving static files in production and Vite dev server in development.
 
 ## External Dependencies
 
@@ -51,8 +53,11 @@ Preferred communication style: Simple, everyday language.
 - **Resend**: Email service for contact form notifications
 
 ### Environment Variables
-No required environment variables for core functionality. Optional:
-- Email integration secrets (managed via Replit integrations)
+Core functionality uses Replit-managed secrets:
+- **AI_INTEGRATIONS_OPENAI_API_KEY**: Auto-configured by Replit AI Integrations
+- **AI_INTEGRATIONS_OPENAI_BASE_URL**: Auto-configured by Replit AI Integrations
+- **Firebase credentials**: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
+- **Email integration**: Managed via Replit Resend integration
 
 ## SEO Implementation
 
@@ -88,3 +93,28 @@ Comprehensive SEO optimizations implemented for improved search engine visibilit
 ### Admin & Error Pages
 - Admin panel has noindex meta tag to prevent search indexing
 - Custom 404 page with noindex and helpful navigation links
+
+## Translation System
+
+### Auto-Translation Feature
+The admin panel includes automatic Hebrew-to-English translation powered by OpenAI (via Replit AI Integrations):
+
+- **Default Behavior**: Auto-translate toggle is enabled by default
+- **When It Works**: When saving a project, any empty English fields (titleEn, descriptionEn, roleEn, locationEn, categoryEn) are automatically translated from their Hebrew counterparts
+- **Translation Provider**: Uses Replit AI Integrations OpenAI endpoint with `gpt-4.1-mini` model
+- **API Endpoint**: `/api/translate` - accepts Hebrew text and returns English translation
+- **Status Check**: `/api/translate/status` - returns whether translation service is available
+- **Cost**: Charged to Replit credits (no external API key required)
+
+### Admin UI Controls
+- **Toggle Switch**: Located at the bottom of the project edit form, above the save button
+- **Visual Indicator**: Shows translation status and whether auto-translate is enabled
+- **Warning Message**: Displays if translation service is not configured
+- **Save Button**: Shows "מתרגם ושומר..." (Translating and saving...) when translation is in progress
+
+### Implementation Details
+- Translation hook: `client/src/hooks/use-translation.ts`
+- Translation utility: `server/translate.ts`
+- Uses OpenAI chat completions API with system prompt optimized for professional translation
+- Handles errors gracefully - continues saving even if individual field translations fail
+- Only translates fields that have Hebrew content and missing English content
