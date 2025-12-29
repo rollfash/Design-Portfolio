@@ -7,10 +7,99 @@ import { Textarea } from "@/components/ui/textarea";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Plus, Edit2, Save, X, Upload, Loader2 } from "lucide-react";
+import { Trash2, Plus, Edit2, Save, X, Upload, Loader2, GripVertical } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUpload } from "@/hooks/use-upload";
 import { useSEO } from "@/lib/seo";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+interface SortableGalleryItemProps {
+  id: string;
+  item: string;
+  index: number;
+  onRemove: () => void;
+}
+
+function SortableGalleryItem({ id, item, index, onRemove }: SortableGalleryItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.mpeg', '.3gp', '.flv'];
+  const isVideo = item.startsWith("data:video") || videoExtensions.some(ext => item.toLowerCase().endsWith(ext));
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 p-3 bg-card border border-border rounded-lg group hover:border-primary/50 transition-colors"
+      data-testid={`gallery-item-${index}`}
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing flex-shrink-0"
+      >
+        <GripVertical className="h-5 w-5 text-muted-foreground" />
+      </div>
+      
+      <div className="w-24 h-16 rounded overflow-hidden border border-border bg-muted shrink-0">
+        {isVideo ? (
+          <video src={item} className="w-full h-full object-cover" />
+        ) : (
+          <img src={item} alt="" className="w-full h-full object-cover" />
+        )}
+      </div>
+      
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-muted-foreground truncate">
+          {isVideo ? 'וידאו' : 'תמונה'} #{index + 1}
+        </p>
+        {index === 0 && (
+          <p className="text-xs text-primary font-medium">תמונת שער</p>
+        )}
+      </div>
+      
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 shrink-0"
+        onClick={onRemove}
+        data-testid={`button-remove-gallery-${index}`}
+      >
+        <Trash2 className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
 
 export function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -45,23 +134,50 @@ export function Admin() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editingProject) {
+      // Validation
+      if (!editingProject.title.trim()) {
+        toast({ title: "שגיאה", description: "נא להזין שם פרויקט", variant: "destructive" });
+        return;
+      }
+      if (!editingProject.image) {
+        toast({ title: "שגיאה", description: "נא להעלות תמונה ראשית", variant: "destructive" });
+        return;
+      }
+      if (!editingProject.year) {
+        toast({ title: "שגיאה", description: "נא להזין שנה", variant: "destructive" });
+        return;
+      }
+
       try {
         if (isAddingNew) {
           // Remove id and createdAt for new projects - server generates these
           const { id, createdAt, ...projectData } = editingProject;
           await addProject(projectData);
-          toast({ title: "פרויקט נוסף", description: "הפרויקט החדש נוסף בהצלחה" });
+          toast({ 
+            title: "פרויקט נוסף בהצלחה", 
+            description: `"${editingProject.title}" נוסף למערכת${editingProject.showOnHome ? ' ומופיע בעמוד הבית' : ''}`,
+            duration: 4000
+          });
         } else {
           const { id, createdAt, ...projectData } = editingProject;
           await updateProject(editingProject.id, projectData);
-          toast({ title: "פרויקט עודכן", description: "השינויים נשמרו בהצלחה" });
+          toast({ 
+            title: "שינויים נשמרו בהצלחה", 
+            description: `הפרויקט "${editingProject.title}" עודכן${editingProject.showOnHome ? ' ומופיע בעמוד הבית' : ''}`,
+            duration: 4000
+          });
         }
         setEditingProject(null);
         setIsAddingNew(false);
       } catch (error: any) {
         console.error("Error saving project:", error);
         const errorMessage = error?.message || "שמירת הפרויקט נכשלה";
-        toast({ title: "שגיאה", description: errorMessage, variant: "destructive" });
+        toast({ 
+          title: "שגיאה בשמירה", 
+          description: errorMessage + " - נא לנסות שוב או לבדוק חיבור לאינטרנט", 
+          variant: "destructive",
+          duration: 5000
+        });
       }
     }
   };
@@ -138,6 +254,24 @@ export function Admin() {
      }
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (editingProject?.gallery && over && active.id !== over.id) {
+      const oldIndex = parseInt(active.id as string, 10);
+      const newIndex = parseInt(over.id as string, 10);
+      const newGallery = arrayMove(editingProject.gallery, oldIndex, newIndex);
+      setEditingProject({ ...editingProject, gallery: newGallery });
+    }
+  };
+
   const startEdit = (project: Project) => {
     setEditingProject({ ...project });
     setIsAddingNew(false);
@@ -162,6 +296,8 @@ export function Admin() {
       services: null,
       servicesEn: null,
       gallery: null,
+      showOnHome: false,
+      createdAt: new Date(),
     });
     setIsAddingNew(true);
   };
@@ -322,6 +458,20 @@ export function Admin() {
                       </div>
                     </div>
 
+                    <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg border border-border">
+                      <input
+                        type="checkbox"
+                        id="showOnHome"
+                        data-testid="checkbox-show-on-home"
+                        checked={editingProject.showOnHome || false}
+                        onChange={(e) => setEditingProject({...editingProject, showOnHome: e.target.checked})}
+                        className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary"
+                      />
+                      <Label htmlFor="showOnHome" className="cursor-pointer text-sm font-medium">
+                        הצג בעמוד הבית (Show on Home)
+                      </Label>
+                    </div>
+
                     <div className="space-y-2">
                       <Label>תיאור</Label>
                       <Textarea 
@@ -368,57 +518,56 @@ export function Admin() {
                     </div>
 
                     <div className="space-y-4 pt-4 border-t border-border">
-                       <Label>גלריית תמונות ווידאו</Label>
-                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          {editingProject.gallery && editingProject.gallery.map((item, index) => {
-                             const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi', '.mkv', '.mpeg', '.3gp', '.flv'];
-                             const isVideo = item.startsWith("data:video") || videoExtensions.some(ext => item.toLowerCase().endsWith(ext));
-                             return (
-                               <div key={index} className="relative aspect-square group rounded overflow-hidden border border-border bg-muted">
-                                  {isVideo ? (
-                                     <video src={item} className="w-full h-full object-cover" />
-                                  ) : (
-                                     <img src={item} alt="" className="w-full h-full object-cover" />
-                                  )}
-                                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                     <Button 
-                                       type="button" 
-                                       variant="destructive" 
-                                       size="icon"
-                                       className="h-8 w-8"
-                                       onClick={() => removeGalleryItem(index)}
-                                     >
-                                        <Trash2 className="h-4 w-4" />
-                                     </Button>
-                                  </div>
-                               </div>
-                             );
-                          })}
-                          
-                          <div className="aspect-square">
-                             <input
-                                type="file"
-                                accept="image/*,video/*"
-                                multiple
-                                onChange={handleGalleryUpload}
-                                className="hidden"
-                                ref={galleryInputRef}
-                                disabled={isUploadingGallery}
-                              />
-                              <Button 
-                                type="button" 
-                                variant="outline" 
-                                onClick={() => galleryInputRef.current?.click()}
-                                className="w-full h-full border-dashed border-2 flex flex-col gap-2 hover:border-primary hover:bg-primary/5"
-                                disabled={isUploadingGallery}
-                              >
-                                {isUploadingGallery ? (
-                                  <><Loader2 className="h-6 w-6 animate-spin" /><span>מעלה...</span></>
-                                ) : (
-                                  <><Plus className="h-6 w-6" /><span>הוסף מדיה</span></>
-                                )}
-                              </Button>
-                          </div>
+                       <div className="flex items-center justify-between">
+                         <Label>גלריית תמונות ווידאו</Label>
+                         <span className="text-xs text-muted-foreground">גרור כדי לסדר מחדש</span>
+                       </div>
+                       <DndContext 
+                         sensors={sensors}
+                         collisionDetection={closestCenter}
+                         onDragEnd={handleDragEnd}
+                       >
+                         <SortableContext 
+                           items={editingProject.gallery?.map((_, i) => i.toString()) || []}
+                           strategy={verticalListSortingStrategy}
+                         >
+                           <div className="space-y-2">
+                              {editingProject.gallery && editingProject.gallery.map((item, index) => (
+                                <SortableGalleryItem
+                                  key={index}
+                                  id={index.toString()}
+                                  item={item}
+                                  index={index}
+                                  onRemove={() => removeGalleryItem(index)}
+                                />
+                              ))}
+                           </div>
+                         </SortableContext>
+                       </DndContext>
+                       
+                       <div className="pt-2">
+                         <input
+                            type="file"
+                            accept="image/*,video/*"
+                            multiple
+                            onChange={handleGalleryUpload}
+                            className="hidden"
+                            ref={galleryInputRef}
+                            disabled={isUploadingGallery}
+                          />
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            onClick={() => galleryInputRef.current?.click()}
+                            className="w-full border-dashed border-2 h-20 hover:border-primary hover:bg-primary/5"
+                            disabled={isUploadingGallery}
+                          >
+                            {isUploadingGallery ? (
+                              <><Loader2 className="mr-2 h-6 w-6 animate-spin" /><span>מעלה תמונות...</span></>
+                            ) : (
+                              <><Plus className="mr-2 h-6 w-6" /><span>הוסף תמונות לגלריה</span></>
+                            )}
+                          </Button>
                        </div>
                     </div>
 

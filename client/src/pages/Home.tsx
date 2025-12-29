@@ -7,14 +7,14 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useProjects } from "@/lib/project-context";
 import { useLanguage } from "@/lib/language-context";
-import { getMostRecentProjects } from "@/lib/project-utils";
+import { getFeaturedProjects } from "@/lib/project-utils";
 import { useMemo } from "react";
 import { useSEO } from "@/lib/seo";
 
 export function Home() {
   const { projects } = useProjects();
   const { t, language, direction } = useLanguage();
-  const featuredProjects = useMemo(() => getMostRecentProjects(projects, 6), [projects]);
+  const featuredProjects = useMemo(() => getFeaturedProjects(projects, 6), [projects]);
   const ArrowIcon = direction === 'rtl' ? ArrowLeft : ArrowRight;
 
   useSEO({

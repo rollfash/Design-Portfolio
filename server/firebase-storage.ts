@@ -70,6 +70,7 @@ export class FirebaseStorage implements IStorage {
     return snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
+      showOnHome: doc.data().showOnHome ?? false,
       createdAt: doc.data().createdAt?.toDate() || new Date()
     })) as Project[];
   }
@@ -81,6 +82,7 @@ export class FirebaseStorage implements IStorage {
     return { 
       id: doc.id, 
       ...data,
+      showOnHome: data?.showOnHome ?? false,
       createdAt: data?.createdAt?.toDate() || new Date()
     } as Project;
   }
@@ -88,6 +90,7 @@ export class FirebaseStorage implements IStorage {
   async createProject(insertProject: InsertProject): Promise<Project> {
     const docRef = await getDb().collection('projects').add({
       ...insertProject,
+      showOnHome: insertProject.showOnHome ?? false,
       createdAt: FieldValue.serverTimestamp()
     });
     const doc = await docRef.get();
@@ -95,6 +98,7 @@ export class FirebaseStorage implements IStorage {
     return { 
       id: doc.id, 
       ...data,
+      showOnHome: data?.showOnHome ?? false,
       createdAt: data?.createdAt?.toDate() || new Date()
     } as Project;
   }
@@ -110,6 +114,7 @@ export class FirebaseStorage implements IStorage {
     return { 
       id: updatedDoc.id, 
       ...data,
+      showOnHome: data?.showOnHome ?? false,
       createdAt: data?.createdAt?.toDate() || new Date()
     } as Project;
   }

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -35,6 +35,7 @@ export const projects = pgTable("projects", {
   services: text("services").array(),
   servicesEn: text("services_en").array(),
   gallery: text("gallery").array(),
+  showOnHome: boolean("show_on_home").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

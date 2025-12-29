@@ -45,3 +45,21 @@ export function getMostRecentProjects(projects: Project[], count: number): Proje
   const sorted = sortProjectsByDate(projects);
   return sorted.slice(0, count);
 }
+
+/**
+ * Get featured projects for home page.
+ * Returns projects with showOnHome=true, or if none exist, falls back to most recent projects.
+ */
+export function getFeaturedProjects(projects: Project[], count: number = 6): Project[] {
+  // Filter projects marked for home page
+  const featured = projects.filter(p => p.showOnHome === true);
+  
+  // If we have featured projects, sort and return them
+  if (featured.length > 0) {
+    const sorted = sortProjectsByDate(featured);
+    return sorted.slice(0, count);
+  }
+  
+  // Fallback: return most recent projects
+  return getMostRecentProjects(projects, count);
+}
