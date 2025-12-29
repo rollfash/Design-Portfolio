@@ -71,10 +71,10 @@ const translations: Record<string, Record<Language, string>> = {
   "service.exhibitions.desc": { he: "תכנון ועיצוב ביתנים שמושכים תשומת לב ומייצרים אינטראקציה.", en: "Planning and designing booths that attract attention and create interaction." },
   "service.set_design.title": { he: "עיצוב סטים והפקה", en: "Set Design & Production" },
   "service.set_design.desc": { he: "יצירת סביבות סוחפות לקולנוע, טלוויזיה, פרסומות ואירועי מותג.", en: "Creating immersive environments for film, TV, commercials, and brand events." },
-  "service.experience.title": { he: "חללי חוויה ומבקרים", en: "Experience & Visitor Centers" },
-  "service.experience.desc": { he: "עיצוב מסעות לקוח ומרכזי מבקרים שמספרים את סיפור המותג.", en: "Designing customer journeys and visitor centers that tell the brand story." },
-  "service.styling.title": { he: "סטיילינג והלבשת חלל", en: "Styling & Space Dressing" },
-  "service.styling.desc": { he: "דיוק הפרטים הקטנים להשלמת האווירה והנראות.", en: "Refining small details to complete the atmosphere and look." },
+  "service.museum.title": { he: "עיצוב חללי חוויה ומוזיאונים", en: "Experiential & Museum Space Design" },
+  "service.museum.desc": { he: "עיצוב חללי תצוגה, מוזיאונים ומרכזי מבקרים שמספרים סיפור ויוצרים חוויה בלתי נשכחת.", en: "Designing exhibition spaces, museums and visitor centers that tell a story and create an unforgettable experience." },
+  "service.stage.title": { he: "עיצוב במות ודוכנים לאירועים", en: "Event Stage & Booth Design" },
+  "service.stage.desc": { he: "תכנון ועיצוב במות הופעה, דוכני תצוגה וחללי אירועים מרשימים.", en: "Planning and designing performance stages, exhibition booths and impressive event spaces." },
 
   // Features
   "feature.space_planning": { he: "תכנון חלל", en: "Space Planning" },
@@ -97,8 +97,8 @@ const translations: Record<string, Record<Language, string>> = {
   // About
   "about.quote": { he: "\"עיצוב הוא לא רק איך שזה נראה, אלא איך שזה גורם לך להרגיש.\"", en: "\"Design is not just what it looks like and feels like. Design is how it works.\"" },
   "about.title": { he: "אהלן, אני גל.", en: "Hi, I'm Gal." },
-  "about.p1": { he: "אני מעצב פנים וסטים מתל אביב, אובססיבי למשחקי אור, טקסטורה וצורה. עם רקע באמנות וארכיטקטורה, אני ניגש לכל חלל כאל קומפוזיציה – ומאזן בין פונקציונליות לעומק נרטיבי.", en: "I'm an interior and set designer based in Tel Aviv, obsessed with the interplay of light, texture, and form. With a background in fine arts and architecture, I approach every space as a composition—balancing functionality with narrative depth." },
-  "about.p2": { he: "העבודה שלי משלבת פרויקטים למגורים ברמה גבוהה, חללים מסחריים ועיצוב הפקה לקולנוע וטלוויזיה. אני מאמין שלסביבה יש כוח להשפיע על רגש והתנהגות.", en: "My work spans high-end residential projects, commercial spaces, and production design for film and television. I believe environments have the power to influence emotion and behavior." },
+  "about.p1": { he: "סטודיו גל שינהורן הינו משרד עיצוב המתמחה בחללים ייצוגיים, חללי חוויה ותערוכות. אנו עוסקים יותר מ-20 שנה ועזרנו ללקוחות רבים ליצור חללים עוצמתיים ומשפיעים. צוות המעצבים המנוסים שלנו נלהב ליצור פרויקטים שהם גם מדהימים ויזואלית וגם פונקציונליים.", en: "Gal Shinhorn Studio is a design firm that specializes in representative spaces, experience spaces, and exhibitions. We've been in business for over 20 years and have helped many clients create powerful and impactful spaces. Our team of experienced designers are passionate about creating projects that are both visually stunning and functional." },
+  "about.p2": { he: "אנו מאמינים בגישה הוליסטית לעיצוב, ושואפים ליצור חללים שהם גם אסתטיים וגם מהדהדים רגשית. עם השילוב הייחודי שלנו של יצירתיות ומומחיות טכנית, אנו בטוחים שנגרום לחזון שלך להתעורר לחיים.", en: "We believe in taking a holistic approach to design, and strive to create spaces that are both aesthetically pleasing and emotionally resonant. With our unique blend of creativity and technical expertise, we are sure to make your vision come to life." },
   "about.approach": { he: "גישה", en: "Approach" },
   "about.approach.desc": { he: "מינימליסטית, אורגנית ומונעת מסיפור. עדיפות לחומרים טבעיים ולקיימות.", en: "Minimalist, organic, and narrative-driven. Prioritizing natural materials and sustainability." },
   "about.tools": { he: "כלים", en: "Tools" },

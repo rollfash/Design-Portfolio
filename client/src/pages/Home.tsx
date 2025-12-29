@@ -139,10 +139,10 @@ export function Home() {
            
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-7xl">
              {[
-               { title: t("service.residential.title"), desc: t("service.residential.desc") },
                { title: t("service.set_design.title"), desc: t("service.set_design.desc") },
-               { title: t("service.commercial.title"), desc: t("service.commercial.desc") },
-               { title: t("service.styling.title"), desc: t("service.styling.desc") }
+               { title: t("service.museum.title"), desc: t("service.museum.desc") },
+               { title: t("service.stage.title"), desc: t("service.stage.desc") },
+               { title: t("service.exhibitions.title"), desc: t("service.exhibitions.desc") }
              ].map((service, i) => (
                <div key={i} className="bg-background p-8 border border-border/60 hover:border-primary/50 transition-all duration-300 group shadow-sm h-full flex flex-col items-center justify-center">
                  <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">{service.title}</h3>

@@ -21,24 +21,24 @@ export function Services() {
 
   const services = [
     {
-      title: t("service.exhibitions.title"),
-      description: t("service.exhibitions.desc"),
-      features: [t("feature.space_planning"), t("feature.materials"), t("feature.custom_furniture"), t("feature.project_mgmt")]
-    },
-    {
       title: t("service.set_design.title"),
       description: t("service.set_design.desc"),
       features: [t("feature.concept"), t("feature.3d"), t("feature.props"), t("feature.set_styling")]
     },
     {
-      title: t("service.experience.title"),
-      description: t("service.experience.desc"),
-      features: [t("feature.brand"), t("feature.flow"), t("feature.lighting"), t("feature.permits")]
+      title: t("service.museum.title"),
+      description: t("service.museum.desc"),
+      features: [t("feature.space_planning"), t("feature.brand"), t("feature.flow"), t("feature.lighting")]
     },
     {
-      title: t("service.styling.title"),
-      description: t("service.styling.desc"),
-      features: [t("feature.art"), t("feature.decor"), t("feature.color"), t("feature.home_styling")]
+      title: t("service.stage.title"),
+      description: t("service.stage.desc"),
+      features: [t("feature.concept"), t("feature.3d"), t("feature.project_mgmt"), t("feature.lighting")]
+    },
+    {
+      title: t("service.exhibitions.title"),
+      description: t("service.exhibitions.desc"),
+      features: [t("feature.space_planning"), t("feature.materials"), t("feature.custom_furniture"), t("feature.project_mgmt")]
     }
   ];
 
