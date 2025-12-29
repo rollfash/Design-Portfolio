@@ -67,14 +67,14 @@ const translations: Record<string, Record<Language, string>> = {
   "services.more_info": { he: "לפרטים נוספים", en: "Learn More" },
 
   // Service Items
-  "service.exhibitions.title": { he: "עיצוב תערוכות וביתנים", en: "Exhibitions & Booths" },
-  "service.exhibitions.desc": { he: "תכנון ועיצוב ביתנים שמושכים תשומת לב ומייצרים אינטראקציה.", en: "Planning and designing booths that attract attention and create interaction." },
+  "service.3d.title": { he: "הדמיות תלת מימד", en: "3D Visualization" },
+  "service.3d.desc": { he: "הדמיות תלת מימד מקצועיות להמחשת פרויקטים לפני ביצוע.", en: "Professional 3D visualizations to illustrate projects before execution." },
   "service.set_design.title": { he: "עיצוב סטים והפקה", en: "Set Design & Production" },
   "service.set_design.desc": { he: "יצירת סביבות סוחפות לקולנוע, טלוויזיה, פרסומות ואירועי מותג.", en: "Creating immersive environments for film, TV, commercials, and brand events." },
   "service.museum.title": { he: "עיצוב חללי חוויה ומוזיאונים", en: "Experiential & Museum Space Design" },
   "service.museum.desc": { he: "עיצוב חללי תצוגה, מוזיאונים ומרכזי מבקרים שמספרים סיפור ויוצרים חוויה בלתי נשכחת.", en: "Designing exhibition spaces, museums and visitor centers that tell a story and create an unforgettable experience." },
-  "service.stage.title": { he: "עיצוב במות ודוכנים לאירועים", en: "Event Stage & Booth Design" },
-  "service.stage.desc": { he: "תכנון ועיצוב במות הופעה, דוכני תצוגה וחללי אירועים מרשימים.", en: "Planning and designing performance stages, exhibition booths and impressive event spaces." },
+  "service.stage.title": { he: "עיצוב במות, דוכנים ותערוכות", en: "Event Stage, Booth Design & Exhibitions Design" },
+  "service.stage.desc": { he: "תכנון ועיצוב במות הופעה, דוכני תצוגה, תערוכות וחללי אירועים מרשימים.", en: "Planning and designing performance stages, exhibition booths, exhibitions and impressive event spaces." },
 
   // Features
   "feature.space_planning": { he: "תכנון חלל", en: "Space Planning" },

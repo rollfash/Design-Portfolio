@@ -23,22 +23,22 @@ export function Services() {
     {
       title: t("service.set_design.title"),
       description: t("service.set_design.desc"),
-      features: [t("feature.concept"), t("feature.3d"), t("feature.props"), t("feature.set_styling")]
+      features: [t("feature.concept"), t("feature.3d"), t("feature.set_styling")]
     },
     {
       title: t("service.museum.title"),
       description: t("service.museum.desc"),
-      features: [t("feature.space_planning"), t("feature.brand"), t("feature.flow"), t("feature.lighting")]
+      features: [t("feature.space_planning"), t("feature.brand")]
     },
     {
       title: t("service.stage.title"),
       description: t("service.stage.desc"),
-      features: [t("feature.concept"), t("feature.3d"), t("feature.project_mgmt"), t("feature.lighting")]
+      features: [t("feature.concept"), t("feature.3d"), t("feature.project_mgmt")]
     },
     {
-      title: t("service.exhibitions.title"),
-      description: t("service.exhibitions.desc"),
-      features: [t("feature.space_planning"), t("feature.materials"), t("feature.custom_furniture"), t("feature.project_mgmt")]
+      title: t("service.3d.title"),
+      description: t("service.3d.desc"),
+      features: [t("feature.3d"), t("feature.concept"), t("feature.materials")]
     }
   ];
 

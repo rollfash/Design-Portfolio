@@ -142,7 +142,7 @@ export function Home() {
                { title: t("service.set_design.title"), desc: t("service.set_design.desc") },
                { title: t("service.museum.title"), desc: t("service.museum.desc") },
                { title: t("service.stage.title"), desc: t("service.stage.desc") },
-               { title: t("service.exhibitions.title"), desc: t("service.exhibitions.desc") }
+               { title: t("service.3d.title"), desc: t("service.3d.desc") }
              ].map((service, i) => (
                <div key={i} className="bg-background p-8 border border-border/60 hover:border-primary/50 transition-all duration-300 group shadow-sm h-full flex flex-col items-center justify-center">
                  <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">{service.title}</h3>
