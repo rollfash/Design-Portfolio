@@ -102,7 +102,7 @@ const translations: Record<string, Record<Language, string>> = {
   "about.approach": { he: "גישה", en: "Approach" },
   "about.approach.desc": { he: "מינימליסטית, אורגנית ומונעת מסיפור. עדיפות לחומרים טבעיים ולקיימות.", en: "Minimalist, organic, and narrative-driven. Prioritizing natural materials and sustainability." },
   "about.tools": { he: "כלים", en: "Tools" },
-  "about.tools.list": { he: "AutoCAD & SketchUp, Adobe Creative Suite, Blender (הדמיה תלת מימדית), סקיצות ידניות", en: "AutoCAD & SketchUp, Adobe Creative Suite, Blender (3D Visualization), Hand Sketching" },
+  "about.tools.list": { he: "AutoCAD & SketchUp, Adobe Creative Suite, Unreal Engine וכלי AI מתקדמים", en: "AutoCAD & SketchUp, Adobe Creative Suite, Unreal Engine and advanced AI tools" },
   "about.publications": { he: "פרסומים", en: "Publications" },
 
   // Contact

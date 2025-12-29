@@ -1,10 +1,18 @@
 import { Layout } from "@/components/layout/Layout";
-import stockOwner from "@assets/stock_images/interior_designer_sk_b3da91c4.jpg";
 import { useLanguage } from "@/lib/language-context";
 import { useSEO, generateAltText } from "@/lib/seo";
+import { useProjects } from "@/lib/project-context";
+import { useMemo } from "react";
 
 export function About() {
   const { t, language } = useLanguage();
+  const { projects } = useProjects();
+
+  const randomProjectImage = useMemo(() => {
+    if (projects.length === 0) return "/avatar.jpg";
+    const randomIndex = Math.floor(Math.random() * projects.length);
+    return projects[randomIndex]?.image || "/avatar.jpg";
+  }, [projects]);
 
   useSEO({
     title: language === 'he'
@@ -13,7 +21,7 @@ export function About() {
     description: language === 'he'
       ? 'למד עלי - גל שינהורן, מעצב הפקה וארט דיירקטור עם גישה מינימליסטית ואורגנית. ניסיון של למעלה מ-20 שנה בעיצוב סטים, תערוכות וחללי חוויה.'
       : 'Learn about Gal Shinhorn - Production Designer & Art Director with a minimalist and organic approach. Over 20 years of experience in set design, exhibitions and experiential spaces.',
-    image: stockOwner,
+    image: randomProjectImage,
     type: 'profile'
   });
 
@@ -26,16 +34,28 @@ export function About() {
              <div className="relative order-2 md:order-1 flex justify-center md:justify-end">
                 <div className="aspect-[3/4] bg-muted overflow-hidden max-w-sm w-full relative">
                   <img 
-                    src={stockOwner} 
+                    src={randomProjectImage} 
                     alt={generateAltText('hero', 'Gal Shinhorn', undefined, language)}
                     loading="lazy"
-                    className="w-full h-full object-cover" />
+                    className="w-full h-full object-cover"
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
+                    draggable={false} />
                   <div className="absolute inset-0 border border-primary/20 m-4 pointer-events-none"></div>
                 </div>
              </div>
 
              <div className="order-1 md:order-2 text-center md:text-start">
-               <h1 className="text-4xl md:text-6xl font-bold mb-8 text-primary">{t("about.title")}</h1>
+               <div className="flex justify-center md:justify-start mb-8">
+                 <img 
+                   src="/avatar.jpg" 
+                   alt="Gal Shinhorn"
+                   className="w-24 h-24 rounded-full object-cover border-2 border-primary/20"
+                   onContextMenu={(e) => e.preventDefault()}
+                   onDragStart={(e) => e.preventDefault()}
+                   draggable={false}
+                 />
+               </div>
                <div className="prose prose-lg text-muted-foreground mb-12 mx-auto md:mx-0">
                  <p className="mb-6">{t("about.p1")}</p>
                  <p className="mb-6">{t("about.p2")}</p>
@@ -63,16 +83,6 @@ export function About() {
                 <p className="font-bold italic text-2xl leading-relaxed text-primary/80">
                   {t("about.quote")}
                 </p>
-             </div>
-             
-             <div className="mt-16">
-               <h4 className="text-sm uppercase tracking-widest text-muted-foreground mb-8">{t("about.publications")}</h4>
-               <div className="flex flex-wrap justify-center gap-12 opacity-40 grayscale">
-                 <span className="font-bold text-2xl">VOGUE</span>
-                 <span className="font-bold text-2xl">AD</span>
-                 <span className="font-bold text-2xl">dwell</span>
-                 <span className="font-bold text-2xl">DEZEEN</span>
-               </div>
              </div>
           </div>
         </div>
