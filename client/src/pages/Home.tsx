@@ -68,7 +68,10 @@ export function Home() {
                 <img 
                   src="/avatar.jpg" 
                   alt={language === 'he' ? "גל שינהורן - פורטרט" : "Gal Shinhorn - Portrait"} 
-                  className="w-[110px] h-[110px] md:w-[140px] md:h-[140px] rounded-full object-cover border-4 border-background/90"
+                  className="w-[110px] h-[110px] md:w-[140px] md:h-[140px] rounded-full object-cover border-4 border-background/90 select-none"
+                  draggable={false}
+                  onContextMenu={(e) => e.preventDefault()}
+                  onDragStart={(e) => e.preventDefault()}
                 />
               </div>
             </motion.div>

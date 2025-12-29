@@ -69,7 +69,6 @@ export function ProjectDetail() {
 
   // Safely handle optional arrays
   const gallery = project.gallery || [project.image];
-  const services = (language === 'en' && project.servicesEn ? project.servicesEn : project.services) || [];
 
   // Localized fields
   const title = language === 'en' && project.titleEn ? project.titleEn : project.title;
@@ -96,7 +95,7 @@ export function ProjectDetail() {
           </div>
 
           {/* Details Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20 border-y border-border py-8 text-center bg-secondary/10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20 border-y border-border py-8 text-center bg-secondary/10">
              <div>
                 <h4 className="font-semibold text-sm uppercase tracking-wider mb-2 text-primary">{t("project.location")}</h4>
                 <p className="text-muted-foreground">{location}</p>
@@ -108,12 +107,6 @@ export function ProjectDetail() {
              <div>
                 <h4 className="font-semibold text-sm uppercase tracking-wider mb-2 text-primary">{t("project.role")}</h4>
                 <p className="text-muted-foreground">{role}</p>
-             </div>
-             <div>
-                <h4 className="font-semibold text-sm uppercase tracking-wider mb-2 text-primary">{t("project.services")}</h4>
-                <div className="text-muted-foreground flex flex-col">
-                  {services.map((s: string) => <span key={s}>{s}</span>)}
-                </div>
              </div>
           </div>
 
@@ -140,7 +133,10 @@ export function ProjectDetail() {
                            src={media} 
                            alt={generateAltText('project-detail', title, i, language)}
                            loading={i === 0 ? "eager" : "lazy"}
-                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 select-none"
+                           draggable={false}
+                           onContextMenu={(e) => e.preventDefault()}
+                           onDragStart={(e) => e.preventDefault()}
                         />
                      )}
                   </div>
