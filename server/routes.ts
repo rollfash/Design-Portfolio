@@ -6,6 +6,35 @@ import { registerObjectStorageRoutes } from "./replit_integrations/object_storag
 import { getResendClient } from "./resend-client";
 import { translateText, translateFields, isTranslationAvailable } from "./translate";
 import multer from "multer";
+import xss from "xss";
+
+// Sanitize user input to prevent XSS attacks
+function sanitizeInput(input: string): string {
+  return xss(input, {
+    whiteList: {},
+    stripIgnoreTag: true,
+    stripIgnoreTagBody: ['script', 'style'],
+  });
+}
+
+// Sanitize object fields recursively
+function sanitizeObject<T extends Record<string, any>>(obj: T): T {
+  const sanitized: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === 'string') {
+      sanitized[key] = sanitizeInput(value);
+    } else if (Array.isArray(value)) {
+      sanitized[key] = value.map(item => 
+        typeof item === 'string' ? sanitizeInput(item) : item
+      );
+    } else if (value && typeof value === 'object') {
+      sanitized[key] = sanitizeObject(value);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+  return sanitized as T;
+}
 
 export async function registerRoutes(
   httpServer: Server,
@@ -252,7 +281,9 @@ Sitemap: ${baseURL}/sitemap.xml
 
   app.post("/api/projects", async (req, res) => {
     try {
-      const validatedData = insertProjectSchema.parse(req.body);
+      // Sanitize input before validation
+      const sanitizedBody = sanitizeObject(req.body);
+      const validatedData = insertProjectSchema.parse(sanitizedBody);
       const project = await storage.createProject(validatedData);
       res.status(201).json(project);
     } catch (error: any) {
@@ -263,7 +294,9 @@ Sitemap: ${baseURL}/sitemap.xml
 
   app.patch("/api/projects/:id", async (req, res) => {
     try {
-      const validatedData = insertProjectSchema.partial().parse(req.body);
+      // Sanitize input before validation
+      const sanitizedBody = sanitizeObject(req.body);
+      const validatedData = insertProjectSchema.partial().parse(sanitizedBody);
       const project = await storage.updateProject(req.params.id, validatedData);
       if (!project) {
         return res.status(404).json({ error: "Project not found" });
@@ -291,7 +324,9 @@ Sitemap: ${baseURL}/sitemap.xml
   // Contact Submissions API
   app.post("/api/contact", async (req, res) => {
     try {
-      const validatedData = insertContactSubmissionSchema.parse(req.body);
+      // Sanitize input before validation
+      const sanitizedBody = sanitizeObject(req.body);
+      const validatedData = insertContactSubmissionSchema.parse(sanitizedBody);
       const submission = await storage.createContactSubmission(validatedData);
       
       // Send email notification via Resend
@@ -300,6 +335,7 @@ Sitemap: ${baseURL}/sitemap.xml
         // Use Resend's default sender - custom domains require verification
         const senderEmail = 'Gal Shinhorn Portfolio <onboarding@resend.dev>';
         console.log("Sending email from:", senderEmail);
+        // All values are already sanitized
         const result = await client.emails.send({
           from: senderEmail,
           to: 'galart1@gmail.com',
