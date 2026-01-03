@@ -153,7 +153,7 @@ export function Admin() {
   // Simple mock login
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "admin123") {
+    if (password === "Dana151205") {
       setIsAuthenticated(true);
       toast({ title: "התחברת בהצלחה", description: "ברוך הבא למערכת הניהול" });
     } else {
