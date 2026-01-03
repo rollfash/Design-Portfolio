@@ -399,7 +399,7 @@ export function Admin() {
                     type="password" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="הזן סיסמה (admin123)"
+                    placeholder="הזן סיסמה"
                   />
                 </div>
                 <Button type="submit" className="w-full">התחבר</Button>
