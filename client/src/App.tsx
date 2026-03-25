@@ -14,8 +14,10 @@ import { Services } from "@/pages/Services";
 import { About } from "@/pages/About";
 import { Contact } from "@/pages/Contact";
 import { Admin } from "@/pages/Admin";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 function Router() {
+  useAnalytics();
   return (
     <Switch>
       <Route path="/" component={Home} />

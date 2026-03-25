@@ -1,12 +1,14 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProjectSchema, insertContactSubmissionSchema } from "@shared/schema";
+import { insertProjectSchema, insertContactSubmissionSchema, pageViews } from "@shared/schema";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { getResendClient } from "./resend-client";
 import { translateText, translateFields, isTranslationAvailable } from "./translate";
 import multer from "multer";
 import xss from "xss";
+import { db } from "./db";
+import { gte, sql, desc, count } from "drizzle-orm";
 
 // Sanitize user input to prevent XSS attacks
 function sanitizeInput(input: string): string {
@@ -370,6 +372,82 @@ Sitemap: ${baseURL}/sitemap.xml
     } catch (error) {
       console.error("Error fetching contact submissions:", error);
       res.status(500).json({ error: "Failed to fetch submissions" });
+    }
+  });
+
+  // Known bot user-agent patterns to filter out
+  const BOT_PATTERNS = /bot|crawl|spider|slurp|baidu|bingpreview|facebookexternalhit|twitterbot|rogerbot|linkedinbot|embedly|quora|showyoubot|outbrain|pinterest|developers\.google\.com|wget|curl|python-requests|go-http-client|java\/|libwww/i;
+
+  // Analytics - Record page view
+  app.post("/api/analytics/pageview", async (req, res) => {
+    try {
+      const userAgent = req.headers['user-agent'] || '';
+      if (BOT_PATTERNS.test(userAgent)) {
+        return res.status(200).json({ ok: true });
+      }
+      const { path, sessionId, duration } = req.body;
+      if (!path || typeof path !== 'string') return res.status(400).json({ error: 'Invalid path' });
+      const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket.remoteAddress || null;
+      await db.insert(pageViews).values({
+        path: path.slice(0, 500),
+        sessionId: sessionId || null,
+        ip,
+        userAgent: userAgent.slice(0, 500),
+        duration: typeof duration === 'number' ? duration : null,
+      });
+      res.status(200).json({ ok: true });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to record' });
+    }
+  });
+
+  // Analytics - Get stats (for admin panel)
+  app.get("/api/analytics/stats", async (req, res) => {
+    try {
+      const now = new Date();
+      const day7ago = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const day30ago = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      const [totalToday] = await db.select({ count: count() }).from(pageViews).where(gte(pageViews.viewedAt, todayStart));
+      const [total7days] = await db.select({ count: count() }).from(pageViews).where(gte(pageViews.viewedAt, day7ago));
+      const [total30days] = await db.select({ count: count() }).from(pageViews).where(gte(pageViews.viewedAt, day30ago));
+
+      // Top pages in last 30 days
+      const topPages = await db.select({
+        path: pageViews.path,
+        count: count(),
+      }).from(pageViews)
+        .where(gte(pageViews.viewedAt, day30ago))
+        .groupBy(pageViews.path)
+        .orderBy(desc(count()))
+        .limit(5);
+
+      // Daily counts for last 7 days
+      const dailyCounts = await db.select({
+        day: sql<string>`to_char(${pageViews.viewedAt}, 'YYYY-MM-DD')`,
+        count: count(),
+      }).from(pageViews)
+        .where(gte(pageViews.viewedAt, day7ago))
+        .groupBy(sql`to_char(${pageViews.viewedAt}, 'YYYY-MM-DD')`)
+        .orderBy(sql`to_char(${pageViews.viewedAt}, 'YYYY-MM-DD')`);
+
+      // Unique visitors (by IP) in last 30 days
+      const [uniqueVisitors] = await db.select({
+        count: sql<number>`count(distinct ${pageViews.ip})`,
+      }).from(pageViews).where(gte(pageViews.viewedAt, day30ago));
+
+      res.json({
+        today: totalToday.count,
+        last7days: total7days.count,
+        last30days: total30days.count,
+        uniqueVisitors30days: uniqueVisitors.count,
+        topPages,
+        dailyCounts,
+      });
+    } catch (error) {
+      console.error("Analytics stats error:", error);
+      res.status(500).json({ error: 'Failed to fetch stats' });
     }
   });
 

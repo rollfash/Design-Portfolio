@@ -94,6 +94,35 @@ Comprehensive SEO optimizations implemented for improved search engine visibilit
 - Admin panel has noindex meta tag to prevent search indexing
 - Custom 404 page with noindex and helpful navigation links
 
+## Analytics System
+
+Built-in, self-hosted analytics with bot filtering:
+
+### What It Tracks
+- Page views per visit (fires on every route change via `useAnalytics` hook in App.tsx)
+- Session IDs (stored in sessionStorage for unique session counting)
+- IP addresses (for unique visitor counts)
+- Time spent on each page (sent via `navigator.sendBeacon` on navigation/unload)
+- User agents (used to filter out bots server-side)
+
+### Bot Filtering
+Server-side regex filters known bots (Googlebot, Bingbot, Baidu, curl, Python scrapers, etc.) before saving to the database. Human visitors only.
+
+### Storage
+Data stored in PostgreSQL `page_views` table via Drizzle ORM.
+
+### API Endpoints
+- `POST /api/analytics/pageview` — record a page view (called automatically from frontend)
+- `GET /api/analytics/stats` — returns stats (used by admin panel)
+
+### Admin Dashboard
+Analytics section at the top of the admin panel shows:
+- Visits today
+- Visits in last 7 days
+- Visits in last 30 days
+- Unique visitors (by IP) in last 30 days
+- Top 5 most visited pages with visual bars
+
 ## Translation System
 
 ### Auto-Translation Feature

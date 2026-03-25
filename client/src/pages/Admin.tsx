@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Plus, Edit2, Save, X, Upload, Loader2, GripVertical, Languages } from "lucide-react";
+import { Trash2, Plus, Edit2, Save, X, Upload, Loader2, GripVertical, Languages, BarChart2, Eye, Users, TrendingUp } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUpload } from "@/hooks/use-upload";
 import { useSEO } from "@/lib/seo";
@@ -411,6 +412,18 @@ export function Admin() {
     );
   }
 
+  const { data: analyticsStats } = useQuery<{
+    today: number;
+    last7days: number;
+    last30days: number;
+    uniqueVisitors30days: number;
+    topPages: { path: string; count: number }[];
+    dailyCounts: { day: string; count: number }[];
+  }>({
+    queryKey: ["/api/analytics/stats"],
+    refetchInterval: 60000,
+  });
+
   return (
     <Layout>
       <div className="container mx-auto py-12 px-6">
@@ -420,6 +433,83 @@ export function Admin() {
             <Button onClick={startAdd} className="gap-2">
               <Plus className="h-4 w-4" /> הוסף פרויקט חדש
             </Button>
+          )}
+        </div>
+
+        {/* Analytics Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart2 className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold">סטטיסטיקות אתר (ביקורים אמיתיים, ללא בוטים)</h2>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <Card>
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <Eye className="h-8 w-8 text-primary opacity-80" />
+                  <div>
+                    <p className="text-2xl font-bold">{analyticsStats?.today ?? '—'}</p>
+                    <p className="text-xs text-muted-foreground">ביקורים היום</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="h-8 w-8 text-primary opacity-80" />
+                  <div>
+                    <p className="text-2xl font-bold">{analyticsStats?.last7days ?? '—'}</p>
+                    <p className="text-xs text-muted-foreground">7 ימים אחרונים</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <BarChart2 className="h-8 w-8 text-primary opacity-80" />
+                  <div>
+                    <p className="text-2xl font-bold">{analyticsStats?.last30days ?? '—'}</p>
+                    <p className="text-xs text-muted-foreground">30 ימים אחרונים</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <Users className="h-8 w-8 text-primary opacity-80" />
+                  <div>
+                    <p className="text-2xl font-bold">{analyticsStats?.uniqueVisitors30days ?? '—'}</p>
+                    <p className="text-xs text-muted-foreground">מבקרים ייחודיים (30 יום)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          {analyticsStats?.topPages && analyticsStats.topPages.length > 0 && (
+            <Card>
+              <CardContent className="pt-4 pb-4">
+                <p className="text-sm font-medium mb-3 text-muted-foreground">עמודים הכי פופולריים (30 יום)</p>
+                <div className="space-y-2">
+                  {analyticsStats.topPages.map((p) => {
+                    const max = analyticsStats.topPages[0].count;
+                    const pct = max > 0 ? Math.round((p.count / max) * 100) : 0;
+                    const label = p.path === '/' ? 'דף הבית' : p.path.replace('/project/', 'פרויקט: ').replace('/', '');
+                    return (
+                      <div key={p.path} className="flex items-center gap-3 text-sm">
+                        <span className="w-32 truncate text-muted-foreground text-xs">{label}</span>
+                        <div className="flex-1 bg-muted rounded-full h-2">
+                          <div className="bg-primary h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-xs font-medium w-6 text-right">{p.count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
 
