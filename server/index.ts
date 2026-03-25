@@ -9,6 +9,10 @@ import rateLimit from "express-rate-limit";
 const app = express();
 const httpServer = createServer(app);
 
+// Trust the first proxy (Replit's infrastructure) so rate limiting
+// can correctly identify real client IPs from X-Forwarded-For header
+app.set('trust proxy', 1);
+
 // Security: Helmet middleware for HTTP security headers
 app.use(helmet({
   contentSecurityPolicy: {
