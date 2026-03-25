@@ -383,6 +383,18 @@ export function Admin() {
     }
   };
 
+  const { data: analyticsStats } = useQuery<{
+    today: number;
+    last7days: number;
+    last30days: number;
+    uniqueVisitors30days: number;
+    topPages: { path: string; count: number }[];
+    dailyCounts: { day: string; count: number }[];
+  }>({
+    queryKey: ["/api/analytics/stats"],
+    refetchInterval: 60000,
+  });
+
   if (!isAuthenticated) {
     return (
       <Layout>
@@ -411,18 +423,6 @@ export function Admin() {
       </Layout>
     );
   }
-
-  const { data: analyticsStats } = useQuery<{
-    today: number;
-    last7days: number;
-    last30days: number;
-    uniqueVisitors30days: number;
-    topPages: { path: string; count: number }[];
-    dailyCounts: { day: string; count: number }[];
-  }>({
-    queryKey: ["/api/analytics/stats"],
-    refetchInterval: 60000,
-  });
 
   return (
     <Layout>
