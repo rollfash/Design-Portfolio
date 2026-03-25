@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { adminHeaders } from "../lib/admin-token";
 
 export interface TranslationResult {
   original: string;
@@ -44,7 +45,7 @@ export function useTranslation() {
     try {
       const response = await fetch("/api/translate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...adminHeaders() },
         body: JSON.stringify({ text, from, to }),
       });
 

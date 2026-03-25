@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Project as DBProject } from '@shared/schema';
+import { adminHeaders } from './admin-token';
 
 // Frontend Project interface extends DB Project (keeping compatibility)
 export interface Project extends Omit<DBProject, 'createdAt'> {
@@ -35,7 +36,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     mutationFn: async (project: Omit<Project, 'id' | 'createdAt'>) => {
       const response = await fetch('/api/projects', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
         body: JSON.stringify(project),
       });
       if (!response.ok) {
@@ -53,7 +54,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     mutationFn: async ({ id, data }: { id: string; data: Partial<Omit<Project, 'id' | 'createdAt'>> }) => {
       const response = await fetch(`/api/projects/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
         body: JSON.stringify(data),
       });
       if (!response.ok) {
@@ -70,6 +71,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     mutationFn: async (id: string) => {
       const response = await fetch(`/api/projects/${id}`, {
         method: 'DELETE',
+        headers: { ...adminHeaders() },
       });
       if (!response.ok) {
         throw new Error('Failed to delete project');

@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { adminHeaders } from "../lib/admin-token";
 import type { UppyFile } from "@uppy/core";
 
 interface UploadResponse {
@@ -72,6 +73,7 @@ export function useUpload(options: UseUploadOptions = {}) {
 
         const response = await fetch("/api/upload", {
           method: "POST",
+          headers: { ...adminHeaders() },
           body: formData,
         });
 
@@ -122,6 +124,7 @@ export function useUpload(options: UseUploadOptions = {}) {
       return {
         method: "POST",
         url: "/api/upload",
+        headers: { ...adminHeaders() } as Record<string, string>,
         fieldName: "file",
       };
     },

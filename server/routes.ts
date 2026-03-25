@@ -1,7 +1,8 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { webcrypto } from "crypto";
 const crypto = webcrypto as Crypto;
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { insertProjectSchema, insertContactSubmissionSchema, pageViews } from "@shared/schema";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
@@ -58,6 +59,29 @@ function isValidSession(token: string): boolean {
   return true;
 }
 
+// Middleware: require valid admin session token
+function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  const token = req.headers['x-admin-token'] as string;
+  if (!token || !isValidSession(token)) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  next();
+}
+
+// Strict rate limiter for admin login (5 attempts per 15 minutes per IP)
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: "Too many login attempts, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Validate that a project ID only contains safe characters (Firebase IDs)
+function isValidId(id: string): boolean {
+  return typeof id === 'string' && id.length > 0 && id.length <= 128 && /^[a-zA-Z0-9_\-]+$/.test(id);
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -65,8 +89,8 @@ export async function registerRoutes(
   // Register object storage routes for file uploads
   registerObjectStorageRoutes(app);
 
-  // Admin login
-  app.post("/api/admin/login", (req, res) => {
+  // Admin login (strict rate limit: 5 attempts per 15 min per IP)
+  app.post("/api/admin/login", loginLimiter, (req, res) => {
     const { password } = req.body;
     const adminPassword = process.env.ADMIN_PASSWORD;
     if (!adminPassword) return res.status(500).json({ error: "Server misconfigured" });
@@ -110,8 +134,8 @@ export async function registerRoutes(
     },
   });
 
-  // File upload endpoint - uploads to object storage for persistence
-  app.post("/api/upload", upload.single("file"), async (req, res) => {
+  // File upload endpoint - uploads to object storage for persistence (admin only)
+  app.post("/api/upload", requireAdmin, upload.single("file"), async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
@@ -278,10 +302,15 @@ Sitemap: ${baseURL}/sitemap.xml
         });
       }
 
-      const { text, from = "Hebrew", to = "English" } = req.body;
-      
-      if (!text || text.trim() === "") {
+      const text = String(req.body.text ?? "").trim();
+      const from = String(req.body.from ?? "Hebrew").slice(0, 32);
+      const to   = String(req.body.to   ?? "English").slice(0, 32);
+
+      if (!text) {
         return res.status(400).json({ error: "Text is required" });
+      }
+      if (text.length > 10000) {
+        return res.status(400).json({ error: "Text is too long (max 10,000 characters)" });
       }
 
       const translated = await translateText(text, from, to);
@@ -314,6 +343,9 @@ Sitemap: ${baseURL}/sitemap.xml
   });
 
   app.get("/api/projects/:id", async (req, res) => {
+    if (!isValidId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid project ID" });
+    }
     try {
       const project = await storage.getProject(req.params.id);
       if (!project) {
@@ -326,9 +358,8 @@ Sitemap: ${baseURL}/sitemap.xml
     }
   });
 
-  app.post("/api/projects", async (req, res) => {
+  app.post("/api/projects", requireAdmin, async (req, res) => {
     try {
-      // Sanitize input before validation
       const sanitizedBody = sanitizeObject(req.body);
       const validatedData = insertProjectSchema.parse(sanitizedBody);
       const project = await storage.createProject(validatedData);
@@ -339,9 +370,11 @@ Sitemap: ${baseURL}/sitemap.xml
     }
   });
 
-  app.patch("/api/projects/:id", async (req, res) => {
+  app.patch("/api/projects/:id", requireAdmin, async (req, res) => {
+    if (!isValidId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid project ID" });
+    }
     try {
-      // Sanitize input before validation
       const sanitizedBody = sanitizeObject(req.body);
       const validatedData = insertProjectSchema.partial().parse(sanitizedBody);
       const project = await storage.updateProject(req.params.id, validatedData);
@@ -355,7 +388,10 @@ Sitemap: ${baseURL}/sitemap.xml
     }
   });
 
-  app.delete("/api/projects/:id", async (req, res) => {
+  app.delete("/api/projects/:id", requireAdmin, async (req, res) => {
+    if (!isValidId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid project ID" });
+    }
     try {
       const success = await storage.deleteProject(req.params.id);
       if (!success) {
