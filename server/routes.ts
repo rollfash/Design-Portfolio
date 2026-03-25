@@ -1,5 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { webcrypto } from "crypto";
+const crypto = webcrypto as Crypto;
 import { storage } from "./storage";
 import { insertProjectSchema, insertContactSubmissionSchema, pageViews } from "@shared/schema";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
@@ -38,12 +40,55 @@ function sanitizeObject<T extends Record<string, any>>(obj: T): T {
   return sanitized as T;
 }
 
+// In-memory session store: token -> expiry timestamp
+const adminSessions = new Map<string, number>();
+const SESSION_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function createSession(): string {
+  const token = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+  adminSessions.set(token, Date.now() + SESSION_TTL_MS);
+  return token;
+}
+
+function isValidSession(token: string): boolean {
+  const expiry = adminSessions.get(token);
+  if (!expiry) return false;
+  if (Date.now() > expiry) { adminSessions.delete(token); return false; }
+  return true;
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
   // Register object storage routes for file uploads
   registerObjectStorageRoutes(app);
+
+  // Admin login
+  app.post("/api/admin/login", (req, res) => {
+    const { password } = req.body;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    if (!adminPassword) return res.status(500).json({ error: "Server misconfigured" });
+    if (password === adminPassword) {
+      const token = createSession();
+      return res.json({ token });
+    }
+    return res.status(401).json({ error: "סיסמה שגויה" });
+  });
+
+  // Admin logout
+  app.post("/api/admin/logout", (req, res) => {
+    const token = req.headers['x-admin-token'] as string;
+    if (token) adminSessions.delete(token);
+    res.json({ ok: true });
+  });
+
+  // Admin session verify
+  app.get("/api/admin/verify", (req, res) => {
+    const token = req.headers['x-admin-token'] as string;
+    res.json({ valid: isValidSession(token) });
+  });
 
   // Configure multer for file uploads (memory storage for object storage upload)
   const upload = multer({

@@ -111,8 +111,9 @@ interface GalleryItemWithId {
 }
 
 export function Admin() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => !!sessionStorage.getItem("_admin_token"));
   const [password, setPassword] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { projects, updateProject, addProject, deleteProject } = useProjects();
   const { toast } = useToast();
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -151,14 +152,28 @@ export function Admin() {
     noindex: true
   });
 
-  // Simple mock login
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "Dana151205") {
-      setIsAuthenticated(true);
-      toast({ title: "התחברת בהצלחה", description: "ברוך הבא למערכת הניהול" });
-    } else {
-      toast({ title: "שגיאה", description: "סיסמה שגויה", variant: "destructive" });
+    setIsLoggingIn(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        const { token } = await res.json();
+        sessionStorage.setItem("_admin_token", token);
+        setIsAuthenticated(true);
+        toast({ title: "התחברת בהצלחה", description: "ברוך הבא למערכת הניהול" });
+      } else {
+        toast({ title: "שגיאה", description: "סיסמה שגויה", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "שגיאה", description: "בעיית חיבור לשרת", variant: "destructive" });
+    } finally {
+      setIsLoggingIn(false);
+      setPassword("");
     }
   };
 
@@ -415,7 +430,9 @@ export function Admin() {
                     placeholder="הזן סיסמה"
                   />
                 </div>
-                <Button type="submit" className="w-full">התחבר</Button>
+                <Button type="submit" className="w-full" disabled={isLoggingIn}>
+                  {isLoggingIn ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />מתחבר...</> : "התחבר"}
+                </Button>
               </form>
             </CardContent>
           </Card>
