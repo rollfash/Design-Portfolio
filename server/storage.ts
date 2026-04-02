@@ -4,7 +4,9 @@ import {
   type Project,
   type InsertProject,
   type ContactSubmission,
-  type InsertContactSubmission
+  type InsertContactSubmission,
+  type BlogPost,
+  type InsertBlogPost,
 } from "@shared/schema";
 
 // Storage interface for all data operations
@@ -23,6 +25,13 @@ export interface IStorage {
   // Contact Submissions
   getAllContactSubmissions(): Promise<ContactSubmission[]>;
   createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
+
+  // Blog Posts
+  getAllBlogPosts(): Promise<BlogPost[]>;
+  getBlogPost(id: string): Promise<BlogPost | undefined>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: string, post: Partial<InsertBlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: string): Promise<boolean>;
 }
 
 // Use Firebase Firestore for persistent storage across deployments

@@ -4,7 +4,7 @@ import { webcrypto } from "crypto";
 const crypto = webcrypto as Crypto;
 import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
-import { insertProjectSchema, insertContactSubmissionSchema, pageViews } from "@shared/schema";
+import { insertProjectSchema, insertContactSubmissionSchema, insertBlogPostSchema, pageViews } from "@shared/schema";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { getResendClient } from "./resend-client";
 import { translateText, translateFields, isTranslationAvailable } from "./translate";
@@ -453,6 +453,73 @@ Sitemap: ${baseURL}/sitemap.xml
     } catch (error) {
       console.error("Error fetching contact submissions:", error);
       res.status(500).json({ error: "Failed to fetch submissions" });
+    }
+  });
+
+  // Blog Posts API
+  app.get("/api/blog", async (req, res) => {
+    try {
+      const posts = await storage.getAllBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ error: "Failed to fetch blog posts" });
+    }
+  });
+
+  app.get("/api/blog/:id", async (req, res) => {
+    if (!isValidId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid blog post ID" });
+    }
+    try {
+      const post = await storage.getBlogPost(req.params.id);
+      if (!post) return res.status(404).json({ error: "Blog post not found" });
+      res.json(post);
+    } catch (error) {
+      console.error("Error fetching blog post:", error);
+      res.status(500).json({ error: "Failed to fetch blog post" });
+    }
+  });
+
+  app.post("/api/blog", requireAdmin, async (req, res) => {
+    try {
+      const sanitizedBody = sanitizeObject(req.body);
+      const validatedData = insertBlogPostSchema.parse(sanitizedBody);
+      const post = await storage.createBlogPost(validatedData);
+      res.status(201).json(post);
+    } catch (error: any) {
+      console.error("Error creating blog post:", error);
+      res.status(400).json({ error: error.message || "Failed to create blog post" });
+    }
+  });
+
+  app.patch("/api/blog/:id", requireAdmin, async (req, res) => {
+    if (!isValidId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid blog post ID" });
+    }
+    try {
+      const sanitizedBody = sanitizeObject(req.body);
+      const validatedData = insertBlogPostSchema.partial().parse(sanitizedBody);
+      const post = await storage.updateBlogPost(req.params.id, validatedData);
+      if (!post) return res.status(404).json({ error: "Blog post not found" });
+      res.json(post);
+    } catch (error: any) {
+      console.error("Error updating blog post:", error);
+      res.status(400).json({ error: error.message || "Failed to update blog post" });
+    }
+  });
+
+  app.delete("/api/blog/:id", requireAdmin, async (req, res) => {
+    if (!isValidId(req.params.id)) {
+      return res.status(400).json({ error: "Invalid blog post ID" });
+    }
+    try {
+      const success = await storage.deleteBlogPost(req.params.id);
+      if (!success) return res.status(404).json({ error: "Blog post not found" });
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting blog post:", error);
+      res.status(500).json({ error: "Failed to delete blog post" });
     }
   });
 

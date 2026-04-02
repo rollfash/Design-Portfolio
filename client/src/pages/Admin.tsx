@@ -7,8 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Layout } from "@/components/layout/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Plus, Edit2, Save, X, Upload, Loader2, GripVertical, Languages, BarChart2, Eye, Users, TrendingUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Trash2, Plus, Edit2, Save, X, Upload, Loader2, GripVertical, Languages, BarChart2, Eye, Users, TrendingUp, FileText, Calendar } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import type { BlogPost } from "@shared/schema";
+import { adminHeaders } from "@/lib/admin-token";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUpload } from "@/hooks/use-upload";
 import { useSEO } from "@/lib/seo";
@@ -124,6 +126,14 @@ export function Admin() {
   const [isTranslating, setIsTranslating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+
+  // Blog state
+  const [editingPost, setEditingPost] = useState<Partial<BlogPost> | null>(null);
+  const [isAddingNewPost, setIsAddingNewPost] = useState(false);
+  const [isSavingPost, setIsSavingPost] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
   const { uploadFile } = useUpload();
   const { isAvailable: translationAvailable, translateText } = useTranslation();
   
@@ -409,6 +419,109 @@ export function Admin() {
     queryKey: ["/api/analytics/stats"],
     refetchInterval: 60000,
   });
+
+  const { data: blogPosts = [] } = useQuery<BlogPost[]>({
+    queryKey: ["blog"],
+    queryFn: async () => {
+      const res = await fetch("/api/blog");
+      if (!res.ok) throw new Error("Failed to fetch posts");
+      return res.json();
+    },
+    enabled: isAuthenticated,
+  });
+
+  const startNewPost = () => {
+    setEditingPost({ title: "", titleEn: "", excerpt: "", excerptEn: "", content: "", contentEn: "", coverImage: "" });
+    setIsAddingNewPost(true);
+  };
+
+  const handleSaveBlogPost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPost) return;
+    if (!editingPost.title?.trim()) {
+      toast({ title: "שגיאה", description: "נא להזין כותרת", variant: "destructive" });
+      return;
+    }
+    if (!editingPost.excerpt?.trim()) {
+      toast({ title: "שגיאה", description: "נא להזין תקציר", variant: "destructive" });
+      return;
+    }
+    if (!editingPost.content?.trim()) {
+      toast({ title: "שגיאה", description: "נא להזין תוכן", variant: "destructive" });
+      return;
+    }
+
+    setIsSavingPost(true);
+    try {
+      const payload = {
+        title: editingPost.title,
+        titleEn: editingPost.titleEn || "",
+        excerpt: editingPost.excerpt,
+        excerptEn: editingPost.excerptEn || "",
+        content: editingPost.content,
+        contentEn: editingPost.contentEn || "",
+        coverImage: editingPost.coverImage || "",
+        publishedAt: editingPost.publishedAt || new Date().toISOString(),
+      };
+
+      if (isAddingNewPost) {
+        const res = await fetch("/api/blog", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...adminHeaders() },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error("Failed to create post");
+        toast({ title: "פוסט נוסף בהצלחה" });
+      } else {
+        const res = await fetch(`/api/blog/${editingPost.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", ...adminHeaders() },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error("Failed to update post");
+        toast({ title: "פוסט עודכן בהצלחה" });
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["blog"] });
+      setEditingPost(null);
+      setIsAddingNewPost(false);
+    } catch (err: any) {
+      toast({ title: "שגיאה", description: err.message, variant: "destructive" });
+    } finally {
+      setIsSavingPost(false);
+    }
+  };
+
+  const handleDeleteBlogPost = async (id: string) => {
+    if (!confirm("האם אתה בטוח שברצונך למחוק פוסט זה?")) return;
+    try {
+      const res = await fetch(`/api/blog/${id}`, {
+        method: "DELETE",
+        headers: { ...adminHeaders() },
+      });
+      if (!res.ok) throw new Error("Failed to delete post");
+      queryClient.invalidateQueries({ queryKey: ["blog"] });
+      toast({ title: "פוסט נמחק" });
+      if (editingPost?.id === id) {
+        setEditingPost(null);
+        setIsAddingNewPost(false);
+      }
+    } catch (err: any) {
+      toast({ title: "שגיאה", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingCover(true);
+    try {
+      const result = await uploadFile(file);
+      if (result) setEditingPost(prev => prev ? { ...prev, coverImage: result.url } : prev);
+    } finally {
+      setIsUploadingCover(false);
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -799,6 +912,215 @@ export function Admin() {
                 <p>בחר פרויקט לעריכה או צור חדש</p>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Blog Management Section */}
+        <div className="mt-16">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-2">
+              <FileText className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-bold">ניהול בלוג</h2>
+            </div>
+            {!editingPost && (
+              <Button onClick={startNewPost} className="gap-2">
+                <Plus className="h-4 w-4" /> פוסט חדש
+              </Button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Blog post list */}
+            <div className="lg:col-span-1 space-y-3">
+              {blogPosts.length === 0 && !editingPost && (
+                <div className="text-center py-12 text-muted-foreground border-2 border-dashed border-border rounded-lg">
+                  <FileText className="h-10 w-10 mx-auto mb-3 opacity-20" />
+                  <p>אין פוסטים עדיין</p>
+                </div>
+              )}
+              {blogPosts.map(post => (
+                <div
+                  key={post.id}
+                  className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                    editingPost?.id === post.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/40 bg-card"
+                  }`}
+                  onClick={() => { setEditingPost({ ...post }); setIsAddingNewPost(false); }}
+                  data-testid={`blog-post-item-${post.id}`}
+                >
+                  <div className="flex items-start gap-3">
+                    {post.coverImage ? (
+                      <img src={post.coverImage} alt="" className="w-14 h-14 rounded object-cover shrink-0" />
+                    ) : (
+                      <div className="w-14 h-14 rounded bg-secondary/40 flex items-center justify-center shrink-0">
+                        <FileText className="h-5 w-5 text-muted-foreground/50" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{post.title}</p>
+                      <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                        <Calendar className="h-3 w-3" />
+                        <span>{new Date(post.publishedAt).toLocaleDateString("he-IL")}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate mt-1">{post.excerpt}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:bg-destructive/10 h-7 w-7 shrink-0"
+                      onClick={(e) => { e.stopPropagation(); handleDeleteBlogPost(post.id); }}
+                      data-testid={`button-delete-blog-${post.id}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Blog post editor */}
+            <div className="lg:col-span-2">
+              {editingPost ? (
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle>{isAddingNewPost ? "פוסט חדש" : "עריכת פוסט"}</CardTitle>
+                      <Button variant="ghost" size="icon" onClick={() => { setEditingPost(null); setIsAddingNewPost(false); }}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleSaveBlogPost} className="space-y-5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>כותרת (עברית) *</Label>
+                          <Input
+                            value={editingPost.title || ""}
+                            onChange={e => setEditingPost(prev => prev ? { ...prev, title: e.target.value } : prev)}
+                            placeholder="כותרת הפוסט"
+                            data-testid="input-blog-title"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Title (English)</Label>
+                          <Input
+                            value={editingPost.titleEn || ""}
+                            onChange={e => setEditingPost(prev => prev ? { ...prev, titleEn: e.target.value } : prev)}
+                            placeholder="Post title"
+                            data-testid="input-blog-title-en"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>תקציר (עברית) *</Label>
+                          <Textarea
+                            value={editingPost.excerpt || ""}
+                            onChange={e => setEditingPost(prev => prev ? { ...prev, excerpt: e.target.value } : prev)}
+                            placeholder="תיאור קצר שמופיע בדף הבלוג"
+                            rows={3}
+                            data-testid="input-blog-excerpt"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Excerpt (English)</Label>
+                          <Textarea
+                            value={editingPost.excerptEn || ""}
+                            onChange={e => setEditingPost(prev => prev ? { ...prev, excerptEn: e.target.value } : prev)}
+                            placeholder="Short description for the blog listing"
+                            rows={3}
+                            data-testid="input-blog-excerpt-en"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>תוכן מלא (עברית) *</Label>
+                          <Textarea
+                            value={editingPost.content || ""}
+                            onChange={e => setEditingPost(prev => prev ? { ...prev, content: e.target.value } : prev)}
+                            placeholder={"כתוב את הפוסט כאן...\n\nשורה ריקה = פסקה חדשה"}
+                            rows={10}
+                            data-testid="input-blog-content"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Full Content (English)</Label>
+                          <Textarea
+                            value={editingPost.contentEn || ""}
+                            onChange={e => setEditingPost(prev => prev ? { ...prev, contentEn: e.target.value } : prev)}
+                            placeholder={"Write the post here...\n\nBlank line = new paragraph"}
+                            rows={10}
+                            data-testid="input-blog-content-en"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>תמונת שער</Label>
+                        {editingPost.coverImage && (
+                          <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-border mb-2">
+                            <img src={editingPost.coverImage} alt="Cover" className="w-full h-full object-cover" />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-2 right-2 h-7 w-7"
+                              onClick={() => setEditingPost(prev => prev ? { ...prev, coverImage: "" } : prev)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleCoverUpload}
+                          className="hidden"
+                          ref={coverInputRef}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => coverInputRef.current?.click()}
+                          className="w-full border-dashed border-2 h-16 hover:border-primary hover:bg-primary/5"
+                          disabled={isUploadingCover}
+                          data-testid="button-upload-cover"
+                        >
+                          {isUploadingCover ? (
+                            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> מעלה...</>
+                          ) : (
+                            <><Upload className="mr-2 h-4 w-4" /> {editingPost.coverImage ? "החלף תמונה" : "העלה תמונת שער"}</>
+                          )}
+                        </Button>
+                      </div>
+
+                      <div className="flex justify-end gap-3 pt-4 border-t border-border">
+                        <Button type="button" variant="outline" onClick={() => { setEditingPost(null); setIsAddingNewPost(false); }}>
+                          ביטול
+                        </Button>
+                        <Button type="submit" className="gap-2" disabled={isSavingPost} data-testid="button-save-blog-post">
+                          {isSavingPost ? (
+                            <><Loader2 className="h-4 w-4 animate-spin" /> שומר...</>
+                          ) : (
+                            <><Save className="h-4 w-4" /> שמור פוסט</>
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="h-full min-h-[300px] flex flex-col items-center justify-center border-2 border-dashed border-border rounded-lg bg-muted/10 text-muted-foreground">
+                  <FileText className="h-12 w-12 mb-4 opacity-20" />
+                  <p>בחר פוסט לעריכה או צור חדש</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

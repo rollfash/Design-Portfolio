@@ -84,5 +84,29 @@ export const insertPageViewSchema = createInsertSchema(pageViews).omit({
 export type InsertPageView = z.infer<typeof insertPageViewSchema>;
 export type PageView = typeof pageViews.$inferSelect;
 
+// Blog Posts
+export const blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  titleEn: text("title_en"),
+  excerpt: text("excerpt").notNull(),
+  excerptEn: text("excerpt_en"),
+  content: text("content").notNull(),
+  contentEn: text("content_en"),
+  coverImage: text("cover_image"),
+  publishedAt: timestamp("published_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  createdAt: true,
+}).extend({
+  publishedAt: z.union([z.string(), z.date()]).optional(),
+});
+
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;
+
 // Export chat models
 export * from "./models/chat";

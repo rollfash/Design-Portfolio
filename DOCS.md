@@ -215,6 +215,21 @@ The schema in `shared/schema.ts` defines the shape; Firebase uses the same field
 | showOnHome | boolean | Whether shown on homepage |
 | createdAt | timestamp | Auto-set on creation |
 
+### `blogPosts` (stored in Firebase Firestore)
+
+| Field | Type | Notes |
+|---|---|---|
+| id | string | Firebase auto-ID |
+| title | string | Hebrew title (required) |
+| titleEn | string | English title |
+| excerpt | string | Hebrew short summary (required) |
+| excerptEn | string | English short summary |
+| content | string | Hebrew full content — double newlines become paragraphs (required) |
+| contentEn | string | English full content |
+| coverImage | string | URL of cover image |
+| publishedAt | timestamp | Publication date (defaults to now) |
+| createdAt | timestamp | Auto-set on creation |
+
 ### `contactSubmissions` (stored in Firebase Firestore)
 
 | Field | Type |

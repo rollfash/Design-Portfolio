@@ -14,6 +14,8 @@ import { Services } from "@/pages/Services";
 import { About } from "@/pages/About";
 import { Contact } from "@/pages/Contact";
 import { Admin } from "@/pages/Admin";
+import { Blog } from "@/pages/Blog";
+import { BlogPost } from "@/pages/BlogPost";
 import { useAnalytics } from "@/hooks/use-analytics";
 
 function Router() {
@@ -26,6 +28,8 @@ function Router() {
       <Route path="/services" component={Services} />
       <Route path="/about" component={About} />
       <Route path="/contact" component={Contact} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/blog/:id" component={BlogPost} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>

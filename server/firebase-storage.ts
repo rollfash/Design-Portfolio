@@ -6,7 +6,9 @@ import {
   type Project,
   type InsertProject,
   type ContactSubmission,
-  type InsertContactSubmission
+  type InsertContactSubmission,
+  type BlogPost,
+  type InsertBlogPost,
 } from "@shared/schema";
 import type { IStorage } from "./storage";
 
@@ -150,5 +152,71 @@ export class FirebaseStorage implements IStorage {
       ...data,
       submittedAt: data?.submittedAt?.toDate() || new Date()
     } as ContactSubmission;
+  }
+
+  async getAllBlogPosts(): Promise<BlogPost[]> {
+    const snapshot = await getDb().collection('blogPosts')
+      .orderBy('publishedAt', 'desc')
+      .get();
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      publishedAt: doc.data().publishedAt?.toDate() || new Date(),
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+    })) as BlogPost[];
+  }
+
+  async getBlogPost(id: string): Promise<BlogPost | undefined> {
+    const doc = await getDb().collection('blogPosts').doc(id).get();
+    if (!doc.exists) return undefined;
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      publishedAt: data?.publishedAt?.toDate() || new Date(),
+      createdAt: data?.createdAt?.toDate() || new Date(),
+    } as BlogPost;
+  }
+
+  async createBlogPost(insertPost: InsertBlogPost): Promise<BlogPost> {
+    const publishedAt = insertPost.publishedAt
+      ? (typeof insertPost.publishedAt === 'string' ? new Date(insertPost.publishedAt) : insertPost.publishedAt)
+      : FieldValue.serverTimestamp();
+    const docRef = await getDb().collection('blogPosts').add({
+      ...insertPost,
+      publishedAt,
+      createdAt: FieldValue.serverTimestamp(),
+    });
+    const doc = await docRef.get();
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      publishedAt: data?.publishedAt?.toDate() || new Date(),
+      createdAt: data?.createdAt?.toDate() || new Date(),
+    } as BlogPost;
+  }
+
+  async updateBlogPost(id: string, updateData: Partial<InsertBlogPost>): Promise<BlogPost | undefined> {
+    const docRef = getDb().collection('blogPosts').doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) return undefined;
+    await docRef.update(updateData);
+    const updatedDoc = await docRef.get();
+    const data = updatedDoc.data();
+    return {
+      id: updatedDoc.id,
+      ...data,
+      publishedAt: data?.publishedAt?.toDate() || new Date(),
+      createdAt: data?.createdAt?.toDate() || new Date(),
+    } as BlogPost;
+  }
+
+  async deleteBlogPost(id: string): Promise<boolean> {
+    const docRef = getDb().collection('blogPosts').doc(id);
+    const doc = await docRef.get();
+    if (!doc.exists) return false;
+    await docRef.delete();
+    return true;
   }
 }

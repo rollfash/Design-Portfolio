@@ -28,6 +28,7 @@ Preferred communication style: Simple, everyday language.
 - **Users**: Basic authentication (id, username, password)
 - **Projects**: Portfolio items with bilingual fields (Hebrew + English), gallery arrays, metadata
 - **Contact Submissions**: Form submissions storage
+- **Blog Posts**: Articles with bilingual fields (title, excerpt, content in HE/EN), cover image, published date
 
 ### Key Design Decisions
 

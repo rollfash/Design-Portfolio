@@ -17,6 +17,7 @@ const translations: Record<string, Record<Language, string>> = {
   "nav.services": { he: "שירותים", en: "Services" },
   "nav.about": { he: "אודות", en: "About" },
   "nav.contact": { he: "צור קשר", en: "Contact" },
+  "nav.blog": { he: "בלוג", en: "Blog" },
   "nav.mode.dark": { he: "מצב כהה", en: "Dark Mode" },
   "nav.mode.light": { he: "מצב בהיר", en: "Light Mode" },
   "nav.lang.en": { he: "EN", en: "EN" },
@@ -125,6 +126,12 @@ const translations: Record<string, Record<Language, string>> = {
   "contact.form.success.desc": { he: "תודה, {name}. נדבר בקרוב.", en: "Thanks, {name}. We'll talk soon." },
   "contact.form.sendAgain": { he: "שלח הודעה נוספת", en: "Send another message" },
   "contact.form.other": { he: "אחר", en: "Other" },
+
+  // Blog
+  "blog.title": { he: "בלוג", en: "Blog" },
+  "blog.subtitle": { he: "מחשבות, השראות וטיפים בנושא עיצוב.", en: "Thoughts, inspiration and tips on design." },
+  "blog.empty": { he: "אין פוסטים עדיין. בקרו שוב בקרוב.", en: "No posts yet. Check back soon." },
+  "blog.readMore": { he: "קרא עוד", en: "Read more" },
 
   // Project Detail
   "project.back": { he: "חזרה לתיק העבודות", en: "Back to Portfolio" },
