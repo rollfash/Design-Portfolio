@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "fG3gkp4k_aft4d3e6rjo0"
+uri = "file://DOCS.md"
+type = "text"
+title = "Codebase Documentation"
