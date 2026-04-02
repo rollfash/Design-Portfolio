@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
+export const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
@@ -24,7 +24,8 @@ export interface TranslationResult {
 export async function translateText(
   text: string,
   fromLang: string = "Hebrew",
-  toLang: string = "English"
+  toLang: string = "English",
+  maxTokens: number = 1024
 ): Promise<string> {
   if (!text || text.trim() === "") {
     return "";
@@ -43,7 +44,7 @@ export async function translateText(
           content: text,
         },
       ],
-      max_completion_tokens: 1024,
+      max_completion_tokens: maxTokens,
       temperature: 0.3, // Lower temperature for more consistent translations
     });
 

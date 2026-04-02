@@ -8,6 +8,7 @@ import { insertProjectSchema, insertContactSubmissionSchema, insertBlogPostSchem
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { getResendClient } from "./resend-client";
 import { translateText, translateFields, isTranslationAvailable } from "./translate";
+import { generateBlogPost } from "./generate-blog";
 import multer from "multer";
 import xss from "xss";
 import { db } from "./db";
@@ -453,6 +454,29 @@ Sitemap: ${baseURL}/sitemap.xml
     } catch (error) {
       console.error("Error fetching contact submissions:", error);
       res.status(500).json({ error: "Failed to fetch submissions" });
+    }
+  });
+
+  // Auto-generate blog post (called by GitHub Actions)
+  app.post("/api/blog/auto-generate", async (req, res) => {
+    const secret = process.env.BLOG_AUTO_GENERATE_SECRET;
+    if (!secret) {
+      return res.status(500).json({ error: "Auto-generate not configured" });
+    }
+    const auth = req.headers.authorization;
+    if (!auth || auth !== `Bearer ${secret}`) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    try {
+      const allPosts = await storage.getAllBlogPosts();
+      const recentTitles = allPosts.slice(0, 10).map((p) => p.title);
+      const generated = await generateBlogPost(recentTitles);
+      const post = await storage.createBlogPost(generated);
+      console.log(`Auto-generated blog post: ${post.title}`);
+      res.status(201).json(post);
+    } catch (error) {
+      console.error("Error auto-generating blog post:", error);
+      res.status(500).json({ error: "Failed to generate blog post" });
     }
   });
 
