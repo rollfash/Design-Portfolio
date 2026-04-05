@@ -1,9 +1,10 @@
 import { openai } from "./translate";
 import { translateText } from "./translate";
-import type { InsertBlogPost } from "../shared/schema";
+import type { InsertBlogPost, Project } from "../shared/schema";
 
 export async function generateBlogPost(
-  recentTitles: string[]
+  recentTitles: string[],
+  projects: Project[]
 ): Promise<InsertBlogPost> {
   const avoidList =
     recentTitles.length > 0
@@ -45,6 +46,9 @@ Return a JSON object with exactly these keys: title, excerpt, content`,
     throw new Error("Missing required fields in generated blog post");
   }
 
+  // Pick a random cover image from project galleries
+  const coverImage = pickRandomProjectImage(projects);
+
   // Translate all fields to English in parallel
   const [titleEn, excerptEn, contentEn] = await Promise.all([
     translateText(generated.title, "Hebrew", "English"),
@@ -59,6 +63,22 @@ Return a JSON object with exactly these keys: title, excerpt, content`,
     excerptEn,
     content: generated.content,
     contentEn,
+    coverImage,
     publishedAt: new Date(),
   };
+}
+
+function pickRandomProjectImage(projects: Project[]): string | undefined {
+  // Collect all available images from projects (cover images + gallery images)
+  const allImages: string[] = [];
+  for (const project of projects) {
+    if (project.image) {
+      allImages.push(project.image);
+    }
+    if (project.gallery && project.gallery.length > 0) {
+      allImages.push(...project.gallery);
+    }
+  }
+  if (allImages.length === 0) return undefined;
+  return allImages[Math.floor(Math.random() * allImages.length)];
 }

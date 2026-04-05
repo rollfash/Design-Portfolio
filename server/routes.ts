@@ -468,9 +468,12 @@ Sitemap: ${baseURL}/sitemap.xml
       return res.status(401).json({ error: "Unauthorized" });
     }
     try {
-      const allPosts = await storage.getAllBlogPosts();
+      const [allPosts, allProjects] = await Promise.all([
+        storage.getAllBlogPosts(),
+        storage.getAllProjects(),
+      ]);
       const recentTitles = allPosts.slice(0, 10).map((p) => p.title);
-      const generated = await generateBlogPost(recentTitles);
+      const generated = await generateBlogPost(recentTitles, allProjects);
       const post = await storage.createBlogPost(generated);
       console.log(`Auto-generated blog post: ${post.title}`);
       res.status(201).json(post);
